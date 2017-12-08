@@ -5,11 +5,12 @@ import re
 
 version = '0.1'
 
-chip_name = 'mc32p7510'
-doc_file = r'E:\temp\jupyter\MC32P7510_UMAN_V1.5.docx'
+chip_name = 'mc35p7041'
+doc_file = r'E:\temp\MC35P7041用户手册_V1.0.docx'
 
-REG_SUMMARY_TABLE_IDENTIFY = '通用数据区'
-IGNORE_REG_NAME = ['', '通用数据区', '保留']
+REG_SUMMARY_TABLE_IDENTIFY = '通用数据存储器区'
+IGNORE_REG_NAME = ['', REG_SUMMARY_TABLE_IDENTIFY, '保留']
+REG_ROW_RE = '([0-9ABCDEF]+)H～[0-9ABCDEF]+H'
 
 
 class WordTable():
@@ -32,7 +33,7 @@ class RegSummaryTable(WordTable):
 
     def __found_addr_range(self, text):
         # match like '188H - 18FH'
-        if re.match('[0-9ABCDEF]+H – [0-9ABCDEF]+H', text):
+        if re.match(REG_ROW_RE, text):
             return True
         else:
             return False
@@ -48,7 +49,7 @@ class RegSummaryTable(WordTable):
     def __get_start_addr(self, idx_row):
         # row_cells = self.table.row_cells(idx_row)
         first_cell_txt = self.table.row_cells(idx_row)[0].text
-        m = re.match('([0-9ABCDEF]+)H – [0-9ABCDEF]+H', first_cell_txt)
+        m = re.match(REG_ROW_RE, first_cell_txt)
         start_addr_txt = m.group(1) if m else '0'
         return int('0x' + start_addr_txt, 16)
 
@@ -176,6 +177,7 @@ def main():
         return -1
     else:
         all_reg_list = reg_sum_tab.get_reg_list_all()
+        print(all_reg_list)
         all_reg_info = get_all_reg_info(doc, all_reg_list)
         # print(all_reg_info)
         write_reg_file(chip_name, all_reg_info)
