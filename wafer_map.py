@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import msvcrt
 
-# from PyInstaller import log as logging 
+# from PyInstaller import log as logging
 # from PyInstaller import compat
 # from os import listdir
-
 
 
 cp_file = 'FA7Y-726810-161604.CP3'
@@ -96,4 +95,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
