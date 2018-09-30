@@ -18,13 +18,14 @@ import requests
 VERSION = '1.0'
 URL_TDIS_TOP = 'http://online.hhgrace.com/web/get_treeList_ztree.tdis'
 URL = 'http://online.hhgrace.com/web/get_docList_search.tdis?treeNodeId=%s&userId=2c9e498b48a7386f0148ac31c83f0108&description=0.11um/F011Q7E8/Design%20Rule/Platform/'
-HEADERS1 = {
-    'Cookie': 'JSESSIONID=DjXWtvBZ2bZKxsd-72sEwiWrd1IZvCn9SYO0uh3SPt82hEn2JM3W!1722218088'
-}
 HEADERS = {
-    'Cookie': 'JSESSIONID=s67aooqxWDzg6H7zkXGgs-ogShQn9xcp0sbf6IhzKZBOHHyBh9qH!1722218088',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'
+    # 'Cookie': 'JSESSIONID=DjXWtvBZ2bZKxsd-72sEwiWrd1IZvCn9SYO0uh3SPt82hEn2JM3W!1722218088'
+    'Cookie': 'JSESSIONID=zbMpgm6xIXdPWpx-9ld1OX3_omWeFsZ2xY48527ZMcd-DtOIuPSl!1722218088'
 }
+# HEADERS = {
+#     'Cookie': 'JSESSIONID=s67aooqxWDzg6H7zkXGgs-ogShQn9xcp0sbf6IhzKZBOHHyBh9qH!1722218088',
+#     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'
+# }
 CSV_TITLE = ['Document Name', 'Version', 'Size',
              'Update Date', 'Level', 'Subject', 'Document Path']
 
