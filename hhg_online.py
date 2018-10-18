@@ -20,7 +20,8 @@ URL_TDIS_TOP = 'http://online.hhgrace.com/web/get_treeList_ztree.tdis'
 URL = 'http://online.hhgrace.com/web/get_docList_search.tdis?treeNodeId=%s&userId=2c9e498b48a7386f0148ac31c83f0108&description=0.11um/F011Q7E8/Design%20Rule/Platform/'
 HEADERS = {
     # 'Cookie': 'JSESSIONID=DjXWtvBZ2bZKxsd-72sEwiWrd1IZvCn9SYO0uh3SPt82hEn2JM3W!1722218088'
-    'Cookie': 'JSESSIONID=zbMpgm6xIXdPWpx-9ld1OX3_omWeFsZ2xY48527ZMcd-DtOIuPSl!1722218088'
+    #'Cookie': 'JSESSIONID=zbMpgm6xIXdPWpx-9ld1OX3_omWeFsZ2xY48527ZMcd-DtOIuPSl!1722218088'
+    'Cookie': 'JSESSIONID=qRmBkCBljEX4i8eZeGMf5iPb4OQAWu_hpeHlffihNcIUXQ6FQH9m!1722218088'
 }
 # HEADERS = {
 #     'Cookie': 'JSESSIONID=s67aooqxWDzg6H7zkXGgs-ogShQn9xcp0sbf6IhzKZBOHHyBh9qH!1722218088',
