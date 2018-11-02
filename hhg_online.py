@@ -1,5 +1,6 @@
 # history:
-# 2018/09/14  v1.5  initial
+# 2018/09/14  v1.0  initial
+# 2018/11/2   v1.1  __save_a_file
 
 
 import csv
@@ -15,13 +16,14 @@ import sys
 import filetype
 import requests
 
-VERSION = '1.0'
+VERSION = '1.1'
 URL_TDIS_TOP = 'http://online.hhgrace.com/web/get_treeList_ztree.tdis'
 URL = 'http://online.hhgrace.com/web/get_docList_search.tdis?treeNodeId=%s&userId=2c9e498b48a7386f0148ac31c83f0108&description=0.11um/F011Q7E8/Design%20Rule/Platform/'
 HEADERS = {
     # 'Cookie': 'JSESSIONID=DjXWtvBZ2bZKxsd-72sEwiWrd1IZvCn9SYO0uh3SPt82hEn2JM3W!1722218088'
-    #'Cookie': 'JSESSIONID=zbMpgm6xIXdPWpx-9ld1OX3_omWeFsZ2xY48527ZMcd-DtOIuPSl!1722218088'
-    'Cookie': 'JSESSIONID=qRmBkCBljEX4i8eZeGMf5iPb4OQAWu_hpeHlffihNcIUXQ6FQH9m!1722218088'
+    # 'Cookie': 'JSESSIONID=zbMpgm6xIXdPWpx-9ld1OX3_omWeFsZ2xY48527ZMcd-DtOIuPSl!1722218088'
+    # 'Cookie': 'JSESSIONID=qRmBkCBljEX4i8eZeGMf5iPb4OQAWu_hpeHlffihNcIUXQ6FQH9m!1722218088'
+    'Cookie': 'JSESSIONID=l13TLgvY0VzjeXyoK5WRXhxXJpWUtcyElRNcVe8AXmZq8OBynd6H!1722218088'
 }
 # HEADERS = {
 #     'Cookie': 'JSESSIONID=s67aooqxWDzg6H7zkXGgs-ogShQn9xcp0sbf6IhzKZBOHHyBh9qH!1722218088',
@@ -87,6 +89,7 @@ class SinglePageDocs():
 
         docs_info = []
         for row in rows:
+            # print(row)
             name = row['name']
             version = row['version']
             size = row['fileSize']
@@ -95,8 +98,9 @@ class SinglePageDocs():
             subject = row['subject']
             path = row['description']
             fileid = row['fileId']
+            id1 = row['id']
             docs_info.append((name, version, size, update_date,
-                              level, subject, path, fileid))
+                              level, subject, path, fileid, id1))
 
         return docs_info
 
@@ -112,17 +116,23 @@ class SinglePageDocs():
 
     def __save_a_file(self, doc_info):
         fileid = doc_info[7]
-        filename = doc_info[0].split('/')[-1]
+        id1 = doc_info[8]
+        whole_name = doc_info[0]
+        filename = whole_name.split('/')[-1]
         # print(filename)
-        url = 'http://online.hhgrace.com/web/downFile.tdis?id=275672&confidentialLevel=D&userId=2c9e498b48a7386f0148ac31c83f0108&fileId=%s&name=%s' % (
-            fileid, filename)
+        url = 'http://online.hhgrace.com/web/downFile.tdis?id=%s&confidentialLevel=D&userId=2c9e498b48a7386f0148ac31c83f0108&fileId=%s&name=%s' % (
+            id1, fileid, whole_name)
+        # print('http://online.hhgrace.com/web/downFile.tdis?id=295123&confidentialLevel=D&userId=2c9e498b48a7386f0148ac31c83f0108&fileId=&name=/DE/EE095LPT5/OTP/GHOTP002K1BLA/designkits/tdis/HHG_EO095LPT5_GHOTP002K1BLAV00K.tar')
+        # print(url)
+
         res = requests.get(url, headers=HEADERS, timeout=60)
         size_of_file = open(filename, 'wb').write(res.content)
         # kind = filetype.guess(filename)
         ext = filename.split('.')[-1].lower()
 
         if ext in ('doc', 'docx'):
-            new_filename = filename.split('.')[0] + '.pdf'
+            # new_filename = filename.split('.')[0] + '.pdf'
+            new_filename = filename.replace(ext, 'pdf')
             shutil.move(filename, new_filename)
         else:
             new_filename = filename
