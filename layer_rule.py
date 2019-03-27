@@ -6,7 +6,7 @@ import os
 import sys
 
 VERSION = '1.0'
-LAYER_FILE = r'e:\temp\xStrmOut_layerMap.txt'
+LAYER_FILE = r'E:\py\toolkit\lay_list.txt'
 RULE_FILE = 'rule'
 
 
@@ -43,9 +43,10 @@ def lay_info(lines):
     infos = []
     for line in lines:
         result = line.split()
+        print(result)
         name = result[0]
-        layer = result[2]
-        datatype = result[3]
+        layer = result[1]
+        datatype = result[2]
         infos.append((name, layer, datatype))
     return infos
 

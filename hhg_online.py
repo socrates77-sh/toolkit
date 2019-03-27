@@ -1,7 +1,7 @@
 # history:
 # 2018/09/14  v1.0  initial
 # 2018/11/2   v1.1  __save_a_file
-
+# 2018/3/27   v1.2  get cookies from chrome automatically
 
 import csv
 import datetime
@@ -15,20 +15,15 @@ import sys
 
 import filetype
 import requests
+import sqlite3
+from win32.win32crypt import CryptUnprotectData
 
-VERSION = '1.1'
+VERSION = '1.2'
 URL_TDIS_TOP = 'http://online.hhgrace.com/web/get_treeList_ztree.tdis'
 URL = 'http://online.hhgrace.com/web/get_docList_search.tdis?treeNodeId=%s&userId=2c9e498b48a7386f0148ac31c83f0108&description=0.11um/F011Q7E8/Design%20Rule/Platform/'
 HEADERS = {
-    # 'Cookie': 'JSESSIONID=DjXWtvBZ2bZKxsd-72sEwiWrd1IZvCn9SYO0uh3SPt82hEn2JM3W!1722218088'
-    # 'Cookie': 'JSESSIONID=zbMpgm6xIXdPWpx-9ld1OX3_omWeFsZ2xY48527ZMcd-DtOIuPSl!1722218088'
-    # 'Cookie': 'JSESSIONID=qRmBkCBljEX4i8eZeGMf5iPb4OQAWu_hpeHlffihNcIUXQ6FQH9m!1722218088'
-    'Cookie': 'JSESSIONID=l13TLgvY0VzjeXyoK5WRXhxXJpWUtcyElRNcVe8AXmZq8OBynd6H!1722218088'
+    'Cookie': 'JSESSIONID=0l-aBgYbcLnFnA1SaYPWNjCCw_KA65INkL6a1t9rIP8mcdUNoJf7!1380980667'
 }
-# HEADERS = {
-#     'Cookie': 'JSESSIONID=s67aooqxWDzg6H7zkXGgs-ogShQn9xcp0sbf6IhzKZBOHHyBh9qH!1722218088',
-#     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'
-# }
 CSV_TITLE = ['Document Name', 'Version', 'Size',
              'Update Date', 'Level', 'Subject', 'Document Path']
 
@@ -200,6 +195,19 @@ def get_url(id, path):
     return s
 
 
+def getcookiefromchrome(host='.oschina.net'):
+    cookiepath = os.environ['LOCALAPPDATA'] + \
+        r"\Google\Chrome\User Data\Default\Cookies"
+    sql = "select host_key,name,encrypted_value from cookies where host_key='%s'" % host
+    # sql = "select host_key,name,encrypted_value from cookies"
+    with sqlite3.connect(cookiepath) as conn:
+        cu = conn.cursor()
+        cookies = {name: CryptUnprotectData(encrypted_value)[1].decode(
+        ) for host_key, name, encrypted_value in cu.execute(sql).fetchall()}
+        # print(cookies)
+        return cookies
+
+
 def main():
     # sys.stdout = io.TextIOWrapper(
     #     sys.stdout.buffer, encoding='gb18030', line_buffering=True)
@@ -210,10 +218,18 @@ def main():
 
     # path = '0.11um/FS11Q7E8/Design Rule/Platform'
     path = sys.argv[1]
+    if path[-1] == '/':
+        path = path[:-1]
+
+    cookies = getcookiefromchrome('online.hhgrace.com')
+    cookies_value = 'JSESSIONID=%s' % cookies['JSESSIONID']
+    HEADERS = {'Cookie': cookies_value}
+
     docs = DocsTree(URL_TDIS_TOP, HEADERS)
     node = docs.node(path)
     id = Node(node).getid()
     url = get_url(id, path)
+    print(url)
 
     a_page_docs = SinglePageDocs(url, HEADERS)
     a_page_docs.list_to_csv()
