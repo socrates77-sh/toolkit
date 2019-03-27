@@ -207,6 +207,18 @@ def getcookiefromchrome(host='.oschina.net'):
         # print(cookies)
         return cookies
 
+def getcookiefrom360se(host='.oschina.net'):
+    cookiepath = os.environ['APPDATA'] + \
+        r"\360se6\User Data\Default\Cookies"
+    sql = "select host_key,name,encrypted_value from cookies where host_key='%s'" % host
+    # sql = "select host_key,name,encrypted_value from cookies"
+    with sqlite3.connect(cookiepath) as conn:
+        cu = conn.cursor()
+        # print(cu.execute(sql).fetchall())
+        cookies = {name: CryptUnprotectData(encrypted_value)[1].decode(
+        ) for host_key, name, encrypted_value in cu.execute(sql).fetchall()}
+        # print(cookies)
+        return cookies
 
 def main():
     # sys.stdout = io.TextIOWrapper(
@@ -221,7 +233,7 @@ def main():
     if path[-1] == '/':
         path = path[:-1]
 
-    cookies = getcookiefromchrome('online.hhgrace.com')
+    cookies = getcookiefrom360se('online.hhgrace.com')
     cookies_value = 'JSESSIONID=%s' % cookies['JSESSIONID']
     HEADERS = {'Cookie': cookies_value}
 
