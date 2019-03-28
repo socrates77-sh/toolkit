@@ -2,6 +2,7 @@
 # 2018/09/14  v1.0  initial
 # 2018/11/2   v1.1  __save_a_file
 # 2018/3/27   v1.2  get cookies from chrome automatically
+# 2018/3/28   v1.3  add input function
 
 import csv
 import datetime
@@ -18,7 +19,7 @@ import requests
 import sqlite3
 from win32.win32crypt import CryptUnprotectData
 
-VERSION = '1.2'
+VERSION = '1.3'
 URL_TDIS_TOP = 'http://online.hhgrace.com/web/get_treeList_ztree.tdis'
 URL = 'http://online.hhgrace.com/web/get_docList_search.tdis?treeNodeId=%s&userId=2c9e498b48a7386f0148ac31c83f0108&description=0.11um/F011Q7E8/Design%20Rule/Platform/'
 HEADERS = {
@@ -207,6 +208,7 @@ def getcookiefromchrome(host='.oschina.net'):
         # print(cookies)
         return cookies
 
+
 def getcookiefrom360se(host='.oschina.net'):
     cookiepath = os.environ['APPDATA'] + \
         r"\360se6\User Data\Default\Cookies"
@@ -220,16 +222,24 @@ def getcookiefrom360se(host='.oschina.net'):
         # print(cookies)
         return cookies
 
+
+def input_path():
+    print('input path:')
+    input_line = sys.stdin.readline().strip()
+    return input_line
+
+
 def main():
     # sys.stdout = io.TextIOWrapper(
     #     sys.stdout.buffer, encoding='gb18030', line_buffering=True)
     print_version(VERSION)
-    if len(sys.argv) != 2:
-        usage()
-        sys.exit(1)
+    # if len(sys.argv) != 2:
+    #     usage()
+    #     sys.exit(1)
 
     # path = '0.11um/FS11Q7E8/Design Rule/Platform'
-    path = sys.argv[1]
+    # path = sys.argv[1]
+    path = input_path()
     if path[-1] == '/':
         path = path[:-1]
 
@@ -241,7 +251,7 @@ def main():
     node = docs.node(path)
     id = Node(node).getid()
     url = get_url(id, path)
-    print(url)
+    # print(url)
 
     a_page_docs = SinglePageDocs(url, HEADERS)
     a_page_docs.list_to_csv()
