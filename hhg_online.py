@@ -1,8 +1,9 @@
 # history:
 # 2018/09/14  v1.0  initial
 # 2018/11/2   v1.1  __save_a_file
-# 2018/3/27   v1.2  get cookies from chrome automatically
-# 2018/3/28   v1.3  add input function
+# 2019/3/27   v1.2  get cookies from chrome automatically
+# 2019/3/28   v1.3  add input function
+# 2019/5/29   v1.4  revise header bug
 
 import csv
 import datetime
@@ -19,7 +20,7 @@ import requests
 import sqlite3
 from win32.win32crypt import CryptUnprotectData
 
-VERSION = '1.3'
+VERSION = '1.4'
 URL_TDIS_TOP = 'http://online.hhgrace.com/web/get_treeList_ztree.tdis'
 URL = 'http://online.hhgrace.com/web/get_docList_search.tdis?treeNodeId=%s&userId=2c9e498b48a7386f0148ac31c83f0108&description=0.11um/F011Q7E8/Design%20Rule/Platform/'
 HEADERS = {
@@ -58,13 +59,14 @@ def usage():
 class SinglePageDocs():
 
     def __init__(self, url, headers):
-        self.__json_res = self.__get_docs(url, headers)
+        self.__headers = headers
+        self.__json_res = self.__get_docs(url)
         self.__url = url
         self.__docs_info = self.__get_docs_info()
 
-    def __get_docs(self, url, headers):
+    def __get_docs(self, url):
         try:
-            res = requests.post(url, headers=headers)
+            res = requests.post(url, headers=self.__headers)
             return res.json()
         except:
             print_err('http_err', url)
@@ -120,8 +122,9 @@ class SinglePageDocs():
             id1, fileid, whole_name)
         # print('http://online.hhgrace.com/web/downFile.tdis?id=295123&confidentialLevel=D&userId=2c9e498b48a7386f0148ac31c83f0108&fileId=&name=/DE/EE095LPT5/OTP/GHOTP002K1BLA/designkits/tdis/HHG_EO095LPT5_GHOTP002K1BLAV00K.tar')
         # print(url)
+        # print(self.__headers)
 
-        res = requests.get(url, headers=HEADERS, timeout=60)
+        res = requests.get(url, headers=self.__headers, timeout=60)
         size_of_file = open(filename, 'wb').write(res.content)
         # kind = filetype.guess(filename)
         ext = filename.split('.')[-1].lower()
@@ -136,6 +139,7 @@ class SinglePageDocs():
 
     def save_all_files(self):
         for doc in self.__docs_info:
+            # print(doc)
             self.__save_a_file(doc)
 
 
@@ -148,6 +152,7 @@ class DocsTree():
     def __get_top(self, url, headers):
         try:
             res = requests.get(url, headers=headers)
+            # print(res.json())
             return res.json()
         except:
             print_err('http_err', url)
@@ -244,11 +249,19 @@ def main():
         path = path[:-1]
 
     cookies = getcookiefrom360se('online.hhgrace.com')
-    cookies_value = 'JSESSIONID=%s' % cookies['JSESSIONID']
+    # print(cookies)
+    # print(cookies['__guid'])
+    # print(cookies['JSESSIONID'])
+    # print(cookies['monitor_count'])
+    # cookies_value = 'JSESSIONID=%s' % cookies['JSESSIONID']
+    # print(cookies_value)
+    cookies_value = '__guid=%s; JSESSIONID=%s; monitor_count=%s' % (
+        cookies['__guid'], cookies['JSESSIONID'], cookies['monitor_count'])
     HEADERS = {'Cookie': cookies_value}
 
     docs = DocsTree(URL_TDIS_TOP, HEADERS)
     node = docs.node(path)
+    # print(node)
     id = Node(node).getid()
     url = get_url(id, path)
     # print(url)
