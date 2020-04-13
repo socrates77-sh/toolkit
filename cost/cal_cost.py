@@ -1,5 +1,6 @@
 # history:
 # 2020/4/12  v1.0  initial
+# 2020/4/13  v1.1  output 2 sheets
 
 
 import os
@@ -16,8 +17,8 @@ from openpyxl.styles import colors, Font, Color, Border, Side, Alignment, Patter
 from PyQt5 import QtWidgets
 from myform import Ui_Form
 
-VERSION = '1.0'
-IS_FAMILY = True
+VERSION = '1.1'
+# IS_FAMILY = True
 
 INX_NAME_WORK_LOAD = 3
 INX_NAME_DETAIL_COST = 1
@@ -103,16 +104,19 @@ def format_xls(xls_file_name, sheet_name, is_family):
 
     workbook.save(filename=xls_file_name)
 
-def report_xls(xls_file_name, sheet_name, df_sum_cost, is_family):
-    if is_family:
-        df = df_sum_cost.sum(level=0, axis=1)
-    else:
-        # df = df_sum_cost.sum(level=1, axis=1)
-        df = df_sum_cost
 
-    df.to_excel(xls_file_name, sheet_name=sheet_name)
-    format_xls(xls_file_name, sheet_name, is_family)
-    # print('[out] %s' % xls_file_name)
+def report_xls(xls_file_name, sheet_name, df_sum_cost):
+    sheet_name_family = '%s-大类' % sheet_name
+    sheet_name_proj = '%s-项目' % sheet_name
+
+    with pd.ExcelWriter(xls_file_name) as xlsx:
+        df = df_sum_cost.sum(level=0, axis=1)
+        df.to_excel(xlsx, sheet_name=sheet_name_family)
+        df = df_sum_cost
+        df.to_excel(xlsx, sheet_name=sheet_name_proj)
+
+    format_xls(xls_file_name, sheet_name_family, is_family=True)
+    format_xls(xls_file_name, sheet_name_proj, is_family=False)
 
 
 def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_sheet):
@@ -129,7 +133,7 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
 
         xls_file_name = 'summary_%s.xlsx' % datetime.datetime.now().date().strftime('%y%m%d')
         report_xls(xls_file_name, work_load_sheet,
-                   df_sum_cost, is_family=IS_FAMILY)
+                   df_sum_cost)
     except Exception as e:
         return e
     return(xls_file_name)
