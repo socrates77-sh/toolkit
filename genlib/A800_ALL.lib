@@ -1,0 +1,7184 @@
+//*******************************************************************************
+// Library Name    : A800_ALL
+// Modified Date   : 2020-04-18 14:55:36
+//*******************************************************************************
+/**************************
+Unit :
+	time : ns
+	capacitance : pf
+	voltage : V
+	current : mA
+	power   : mW
+**************************/
+
+/* ******************************* */
+/* ****  Library Description  **** */
+/* ******************************* */
+
+library (A800_ALL)  {
+
+/* General Library Attributes */
+
+	technology (cmos) ;
+	delay_model      : table_lookup;
+	bus_naming_style : "%s[%d]";
+	simulation  : true;
+
+
+/* Unit Definition */
+
+	time_unit               : "1ns";
+	voltage_unit            : "1V";
+	current_unit            : "1mA";
+	capacitive_load_unit (1,pf);
+	pulling_resistance_unit : "1kohm";
+
+
+/* Added for DesignPower (Power Estimation). */
+	leakage_power_unit : 1pW;
+	default_cell_leakage_power : 1;
+
+slew_lower_threshold_pct_rise :  30 ;
+slew_upper_threshold_pct_rise :  70 ;
+input_threshold_pct_fall      :  50 ;
+output_threshold_pct_fall     :  50 ;
+input_threshold_pct_rise      :  50 ;
+output_threshold_pct_rise     :  50 ;
+slew_lower_threshold_pct_fall :  30 ;
+slew_upper_threshold_pct_fall :  70 ;
+slew_derate_from_library      :  0.4 ;
+
+
+/****************************/
+/** user supplied nominals **/
+/****************************/
+
+nom_voltage     : 1.5;
+nom_temperature : 25 ;
+nom_process     : 1.0 ;
+
+
+operating_conditions("typ"){
+process :   1.0 ;
+temperature :  25 ;
+voltage :      1.5 ;
+tree_type : "balanced_tree" ;
+}
+
+default_operating_conditions  : typ ;
+
+
+
+/****************************/
+/** user supplied defaults **/
+/****************************/
+
+default_inout_pin_cap           :       0.0200;
+default_input_pin_cap           :       0.0200;
+default_output_pin_cap          :       0.0000;
+default_fanout_load             :       1.0000;
+
+
+/* Type declarations */
+
+  type (bus2)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 2;
+    bit_from  : 1
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus3)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 3;
+    bit_from  : 2
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus4)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 4;
+    bit_from  : 3
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus5)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 5;
+    bit_from  : 4
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus6)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 6;
+    bit_from  : 5
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus7)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 7;
+    bit_from  : 6
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus8)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 8;
+    bit_from  : 7
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus9)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 9;
+    bit_from  : 8
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus10)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 10;
+    bit_from  : 9
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus11)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 11;
+    bit_from  : 10
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus12)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 12;
+    bit_from  : 11
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus13)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 13;
+    bit_from  : 12
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus14)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 14;
+    bit_from  : 13
+    bit_to    : 0;
+    downto    : true;
+  }
+
+  type (bus15)  {
+    base_type : array;
+    data_type : bit;
+    bit_width : 15;
+    bit_from  : 14
+    bit_to    : 0;
+    downto    : true;
+  }
+
+cell (A801_A_AFE_TOP) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VDDPD_STD_ISOB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (HIRC_LDOCAL_15V) {
+        bus_type       : "bus4";
+        pin (HIRC_LDOCAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_LDOCAL_15V */
+
+  bus (HIRC_TADJ_15V) {
+        bus_type       : "bus4";
+        pin (HIRC_TADJ_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_TADJ_15V */
+
+  bus (HIRC_CAL_15V) {
+        bus_type       : "bus8";
+        pin (HIRC_CAL_15V[7]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_CAL_15V */
+
+   pin (HIRC_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LIRC_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LIRC_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (HXT_GAINS_15V) {
+        bus_type       : "bus2";
+        pin (HXT_GAINS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HXT_GAINS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HXT_GAINS_15V */
+
+  bus (HXT_FQS_15V) {
+        bus_type       : "bus2";
+        pin (HXT_FQS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HXT_FQS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HXT_FQS_15V */
+
+  bus (HXT_FILS_15V) {
+        bus_type       : "bus3";
+        pin (HXT_FILS_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HXT_FILS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HXT_FILS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HXT_FILS_15V */
+
+   pin (HXT_PBK_OSCI_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_PBK_OSCO_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_PADIN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_PADOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_CLKO_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_STOP_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_STOPB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+  bus (HXT_FILS_15V) {
+        bus_type       : "bus3";
+        pin (HXT_FILS_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HXT_FILS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HXT_FILS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HXT_FILS_15V */
+
+   pin (LXT_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (LXT_GAINS_15V) {
+        bus_type       : "bus2";
+        pin (LXT_GAINS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (LXT_GAINS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus LXT_GAINS_15V */
+
+  bus (LXT_RON_15V) {
+        bus_type       : "bus2";
+        pin (LXT_RON_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (LXT_RON_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus LXT_RON_15V */
+
+  bus (LXT_OPIS_15V) {
+        bus_type       : "bus2";
+        pin (LXT_OPIS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (LXT_OPIS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus LXT_OPIS_15V */
+
+  bus (LXT_IBS_15V) {
+        bus_type       : "bus2";
+        pin (LXT_IBS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (LXT_IBS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus LXT_IBS_15V */
+
+   pin (LXT_PADIN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LXT_PADOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LXT_CLKO_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PLL_FIN) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (PLL_M) {
+        bus_type       : "bus7";
+        pin (PLL_M[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PLL_M[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PLL_M[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PLL_M[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PLL_M[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PLL_M[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PLL_M[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus PLL_M */
+
+   pin (PLL_PD) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PLL_FOUT) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PLL_LOCK) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VBATE) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15DPOR_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15DPORB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15RPOR_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15RPORB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PVDE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (PVDS_15V) {
+        bus_type       : "bus3";
+        pin (PVDS_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PVDS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PVDS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus PVDS_15V */
+
+  bus (PVDCAL_15V) {
+        bus_type       : "bus4";
+        pin (PVDCAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PVDCAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PVDCAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PVDCAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus PVDCAL_15V */
+
+   pin (PVDO_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PVDOB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PVDO_TEST_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORAE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (PORACAL_15V) {
+        bus_type       : "bus4";
+        pin (PORACAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORACAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORACAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORACAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus PORACAL_15V */
+
+  bus (PORDCAL_15V) {
+        bus_type       : "bus4";
+        pin (PORDCAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORDCAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORDCAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORDCAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus PORDCAL_15V */
+
+   pin (PORD_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORDB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORD_TEST_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORA_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORAB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORA_TEST_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+  bus (TS_CAL_15V) {
+        bus_type       : "bus5";
+        pin (TS_CAL_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (TS_CAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (TS_CAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (TS_CAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (TS_CAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus TS_CAL_15V */
+
+   pin (TS_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_CLK_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_PUMPEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_STOPB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_SAMPLE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_SAMPLEOK_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_PUMPTIME_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (ADC_AIN_50V) {
+        bus_type       : "bus10";
+        pin (ADC_AIN_50V[9]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[8]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[7]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_AIN_50V */
+
+  bus (ADC_CHSEL_15V) {
+        bus_type       : "bus13";
+        pin (ADC_CHSEL_15V[12]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[11]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[10]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[9]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[8]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[7]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_CHSEL_15V */
+
+   pin (ADC_CALEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (ADC_CALVAL_15V) {
+        bus_type       : "bus7";
+        pin (ADC_CALVAL_15V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_CALVAL_15V */
+
+  bus (ADC_ITRIM1_15V) {
+        bus_type       : "bus4";
+        pin (ADC_ITRIM1_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_ITRIM1_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_ITRIM1_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_ITRIM1_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_ITRIM1_15V */
+
+  bus (ADC_RES_15V) {
+        bus_type       : "bus2";
+        pin (ADC_RES_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_RES_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_RES_15V */
+
+  bus (ADC_DOUT_15V) {
+        bus_type       : "bus12";
+        pin (ADC_DOUT_15V[11]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[10]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[9]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[8]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[7]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[6]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[5]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[4]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_DOUT_15V */
+
+   pin (ADC_EOC_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (VRTC) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GRTC) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VBAT) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GBAT) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VBAT_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (MUX_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (MUX_INS_15V) {
+        bus_type       : "bus4";
+        pin (MUX_INS_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_INS_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_INS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_INS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus MUX_INS_15V */
+
+   pin (MUX_OUT0_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (MUX_OUTPBK_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (RLS_VDD_REQ_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (RLS_STB_REQ_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (STDBY_MODE_FLAG_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ISO_OUT_V15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (ISO_OUTB_V15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (RLS_STB_ACK_V15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (RLS_STB_ACKB_V15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA0_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA0_CLRE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA0_CLRS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OPA0_CLRN_15V) {
+        bus_type       : "bus6";
+        pin (OPA0_CLRN_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_CLRN_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_CLRN_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_CLRN_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_CLRN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_CLRN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA0_CLRN_15V */
+
+  bus (OPA0_CLRP_15V) {
+        bus_type       : "bus6";
+        pin (OPA0_CLRP_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_CLRP_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_CLRP_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_CLRP_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_CLRP_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_CLRP_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA0_CLRP_15V */
+
+  bus (OPA_ITRIM1_15V) {
+        bus_type       : "bus3";
+        pin (OPA_ITRIM1_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM1_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM1_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_ITRIM1_15V */
+
+  bus (OPA_ITRIM2_15V) {
+        bus_type       : "bus3";
+        pin (OPA_ITRIM2_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM2_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM2_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_ITRIM2_15V */
+
+  bus (OPA0_NSEL_15V) {
+        bus_type       : "bus2";
+        pin (OPA0_NSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_NSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA0_NSEL_15V */
+
+  bus (OPA0_GAIN_15V) {
+        bus_type       : "bus2";
+        pin (OPA0_GAIN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA0_GAIN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA0_GAIN_15V */
+
+   pin (OPA0_N_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA0_P_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA0_CLR_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA0_OUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA1_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA1_CLRE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA1_CLRS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OPA1_CLRN_15V) {
+        bus_type       : "bus6";
+        pin (OPA1_CLRN_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_CLRN_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_CLRN_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_CLRN_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_CLRN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_CLRN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA1_CLRN_15V */
+
+  bus (OPA1_CLRP_15V) {
+        bus_type       : "bus6";
+        pin (OPA1_CLRP_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_CLRP_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_CLRP_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_CLRP_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_CLRP_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_CLRP_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA1_CLRP_15V */
+
+  bus (OPA1_NSEL_15V) {
+        bus_type       : "bus2";
+        pin (OPA1_NSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_NSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA1_NSEL_15V */
+
+  bus (OPA1_GAIN_15V) {
+        bus_type       : "bus2";
+        pin (OPA1_GAIN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA1_GAIN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA1_GAIN_15V */
+
+   pin (OPA1_N_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA1_P_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA1_CLR_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA1_OUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA2_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA0_CLRE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA0_CLRS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OPA2_CLRN_15V) {
+        bus_type       : "bus6";
+        pin (OPA2_CLRN_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_CLRN_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_CLRN_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_CLRN_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_CLRN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_CLRN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA2_CLRN_15V */
+
+  bus (OPA2_CLRP_15V) {
+        bus_type       : "bus6";
+        pin (OPA2_CLRP_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_CLRP_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_CLRP_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_CLRP_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_CLRP_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_CLRP_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA2_CLRP_15V */
+
+  bus (OPA2_NSEL_15V) {
+        bus_type       : "bus2";
+        pin (OPA2_NSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_NSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA2_NSEL_15V */
+
+  bus (OPA2_GAIN_15V) {
+        bus_type       : "bus2";
+        pin (OPA2_GAIN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA2_GAIN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA2_GAIN_15V */
+
+   pin (OPA2_N_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA2_P_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA2_CLR_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA2_OUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (CMP0_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP0_CLRE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP0_CLRS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (CMP0_CLRN_15V) {
+        bus_type       : "bus6";
+        pin (CMP0_CLRN_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_CLRN_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_CLRN_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_CLRN_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_CLRN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_CLRN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP0_CLRN_15V */
+
+  bus (CMP0_CLRP_15V) {
+        bus_type       : "bus6";
+        pin (CMP0_CLRP_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_CLRP_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_CLRP_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_CLRP_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_CLRP_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_CLRP_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP0_CLRP_15V */
+
+  bus (CMP0_HYST_15V) {
+        bus_type       : "bus2";
+        pin (CMP0_HYST_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_HYST_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP0_HYST_15V */
+
+   pin (CMP0_VOLT_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (CMP0_VREFSEL_15V) {
+        bus_type       : "bus3";
+        pin (CMP0_VREFSEL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_VREFSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_VREFSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP0_VREFSEL_15V */
+
+  bus (CMP0_PSEL_15V) {
+        bus_type       : "bus3";
+        pin (CMP0_PSEL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_PSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_PSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP0_PSEL_15V */
+
+   pin (CMP0_NSEL_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP0_N_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (CMP0_P_50V) {
+        bus_type       : "bus3";
+        pin (CMP0_P_50V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_P_50V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP0_P_50V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP0_P_50V */
+
+   pin (CMP0_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (CMP1_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP1_CLRE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP1_CLRS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (CMP1_CLRN_15V) {
+        bus_type       : "bus6";
+        pin (CMP1_CLRN_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_CLRN_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_CLRN_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_CLRN_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_CLRN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_CLRN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP1_CLRN_15V */
+
+  bus (CMP1_CLRP_15V) {
+        bus_type       : "bus6";
+        pin (CMP1_CLRP_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_CLRP_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_CLRP_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_CLRP_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_CLRP_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_CLRP_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP1_CLRP_15V */
+
+  bus (CMP1_HYST_15V) {
+        bus_type       : "bus2";
+        pin (CMP1_HYST_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_HYST_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP1_HYST_15V */
+
+   pin (CMP1_VOLT_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (CMP1_VREFSEL_15V) {
+        bus_type       : "bus3";
+        pin (CMP1_VREFSEL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_VREFSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_VREFSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP1_VREFSEL_15V */
+
+  bus (CMP1_PSEL_15V) {
+        bus_type       : "bus2";
+        pin (CMP1_PSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP1_PSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP1_PSEL_15V */
+
+   pin (CMP1_NSEL_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP1_N_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP1_P_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP1_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_V12EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_V20EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (VREF_V20CAL_15V) {
+        bus_type       : "bus4";
+        pin (VREF_V20CAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (VREF_V20CAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (VREF_V20CAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (VREF_V20CAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus VREF_V20CAL_15V */
+
+  bus (ID_OUT) {
+        bus_type       : "bus4";
+        pin (ID_OUT[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ID_OUT[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ID_OUT[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ID_OUT[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus ID_OUT */
+
+  bus (VER_OUT) {
+        bus_type       : "bus4";
+        pin (VER_OUT[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (VER_OUT[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (VER_OUT[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (VER_OUT[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus VER_OUT */
+
+   pin (G15D_IO) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_LPLDO) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_MLDO) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_PWS) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_HSE) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_PORRES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_MLDO ) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_RTCLDO ) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_HSE) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_BAT) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_PWS) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_CAP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15R_CAP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_ADA) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_ADD) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_ADDA) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_ADCOM) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_ADVREFP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_PORRES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_OPACMPRES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_PVD) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_TEMP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_HSI) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_OPA) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_CMP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_ADA) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_ADD) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_ADDA) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_ADCOM) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_ADVREFN) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_VRNDUMMY) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_PVD) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_TEMP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_HSI) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_OPA) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_OPACMPRES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_CMP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VBAT_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VBAT_POR) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VRTC) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell A801_A_AFE_TOP */
+
+cell (HGF011Q7E6_50V_RC016M02V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_VBGI) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (HIRC_LDOCAL_15V) {
+        bus_type       : "bus4";
+        pin (HIRC_LDOCAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_LDOCAL_15V */
+
+  bus (HIRC_TADJ_15V) {
+        bus_type       : "bus4";
+        pin (HIRC_TADJ_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_TADJ_15V */
+
+  bus (HIRC_CAL_15V) {
+        bus_type       : "bus8";
+        pin (HIRC_CAL_15V[7]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_CAL_15V */
+
+   pin (HIRC_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_EN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_LDO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_RC016M02V1 */
+
+cell (HGF011Q7E6_50V_RC016M03V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_VBGI) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (HIRC_LDOCAL_15V) {
+        bus_type       : "bus4";
+        pin (HIRC_LDOCAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_LDOCAL_15V */
+
+  bus (HIRC_TADJ_15V) {
+        bus_type       : "bus4";
+        pin (HIRC_TADJ_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_TADJ_15V */
+
+  bus (HIRC_CAL_15V) {
+        bus_type       : "bus8";
+        pin (HIRC_CAL_15V[7]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_CAL_15V */
+
+   pin (HIRC_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_EN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_LDO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_RC016M03V1 */
+
+cell (HGF011Q7E6_50V_RC016M04V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_VBGI) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (HIRC_LDOCAL_15V) {
+        bus_type       : "bus4";
+        pin (HIRC_LDOCAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_LDOCAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_LDOCAL_15V */
+
+  bus (HIRC_TADJ_15V) {
+        bus_type       : "bus4";
+        pin (HIRC_TADJ_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_TADJ_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_TADJ_15V */
+
+  bus (HIRC_CAL_15V) {
+        bus_type       : "bus8";
+        pin (HIRC_CAL_15V[7]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HIRC_CAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HIRC_CAL_15V */
+
+   pin (HIRC_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_EN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HIRC_LDO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_RC016M04V1 */
+
+cell (HGF011Q7E6_50V_RC040K01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LIRC_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LIRC_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LIRC_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_RC040K01V1 */
+
+cell (HGF011Q7E6_50V_HXT00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (HXT_GAINS_15V) {
+        bus_type       : "bus2";
+        pin (HXT_GAINS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HXT_GAINS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HXT_GAINS_15V */
+
+  bus (HXT_FQS_15V) {
+        bus_type       : "bus2";
+        pin (HXT_FQS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (HXT_FQS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus HXT_FQS_15V */
+
+   pin (HXT_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_PBK_OSCI_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_PBK_OSCO_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_PADIN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_PADOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_CLKO_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_STOP_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (HXT_STOPB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_HXT00V1 */
+
+cell (HGF011Q7E6_15V_LXT00V1 ) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VRTC) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GRTC) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LXT_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (LXT_GAINS_15V) {
+        bus_type       : "bus2";
+        pin (LXT_GAINS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (LXT_GAINS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus LXT_GAINS_15V */
+
+  bus (LXT_RON_15V) {
+        bus_type       : "bus2";
+        pin (LXT_RON_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (LXT_RON_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus LXT_RON_15V */
+
+  bus (LXT_OPIS_15V) {
+        bus_type       : "bus2";
+        pin (LXT_OPIS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (LXT_OPIS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus LXT_OPIS_15V */
+
+  bus (LXT_IBS_15V) {
+        bus_type       : "bus2";
+        pin (LXT_IBS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (LXT_IBS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus LXT_IBS_15V */
+
+   pin (LXT_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LXT_PADIN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LXT_PADOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LXT_CLKO_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_15V_LXT00V1  */
+
+cell (JLPLLCG060MCD) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VDDA15) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GNDA15) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (FIN) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (M) {
+        bus_type       : "bus7";
+        pin (M[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (M[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (M[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (M[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (M[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (M[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (M[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus M */
+
+  bus (N) {
+        bus_type       : "bus6";
+        pin (N[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (N[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (N[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (N[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (N[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (N[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus N */
+
+  bus (OD) {
+        bus_type       : "bus2";
+        pin (OD[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OD[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OD */
+
+   pin (OEN) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (BP) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PD) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (FOUT) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LOCK) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell JLPLLCG060MCD */
+
+cell (HGF011Q7E6_50V_IOPAD03V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (IO_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (INEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OUTEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PHENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PLENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (D_O_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OSPEEDS_15V) {
+        bus_type       : "bus2";
+        pin (OSPEEDS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OSPEEDS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OSPEEDS_15V */
+
+   pin (PAD_I_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_IOPAD03V1 */
+
+cell (HGF011Q7E6_50V_IOPAD04V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (IO_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (INEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OUTEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PHENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PLENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (D_O_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OSPEEDS_15V) {
+        bus_type       : "bus2";
+        pin (OSPEEDS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OSPEEDS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OSPEEDS_15V */
+
+   pin (FMPS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PAD_I_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_IOPAD04V1 */
+
+cell (HGF011Q7E6_50V_IOPAD05V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VRTC) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (INEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OUTEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PHENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PLENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (D_O_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OSPEEDS_15V) {
+        bus_type       : "bus2";
+        pin (OSPEEDS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OSPEEDS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OSPEEDS_15V */
+
+   pin (PAD_I_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_IOPAD05V1 */
+
+cell (HGF011Q7E6_50V_IOPAD06V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (I_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (O_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (INEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OUTEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PHENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PLENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (D_O_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OSPEEDS_15V) {
+        bus_type       : "bus2";
+        pin (OSPEEDS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OSPEEDS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OSPEEDS_15V */
+
+   pin (PAD_I_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PAD_I_15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_IOPAD06V1 */
+
+cell (HGF011Q7E6_50V_IOPAD07V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (IO_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (INEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OUTEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PHENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PLENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (D_O_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OSPEEDS_15V) {
+        bus_type       : "bus2";
+        pin (OSPEEDS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OSPEEDS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OSPEEDS_15V */
+
+   pin (PAD_I_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_IOPAD07V1 */
+
+cell (HGF011Q7E6_50V_BOOTPAD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (PHENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PLENB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PAD_I_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PAD_IB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_BOOTPAD01V1 */
+
+cell (HGF011Q7E6_50V_RESETPAD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (IO_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OUTEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PAD_I_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PAD_IB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_RESETPAD01V1 */
+
+cell (HGF011Q7E6_50V_TESTPAD00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (PAD_I_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PAD_IB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_TESTPAD00V1 */
+
+cell (connect_01v1_02v1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VRTC) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell connect_01v1_02v1 */
+
+cell (RCMCU_PLVPP) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VSSH) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VDD) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell RCMCU_PLVPP */
+
+cell (HGF011Q7E6_50V_VDDPAD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15R_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_LPLDO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_MLDO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_PWS) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_HSE) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_PORRES) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_VDDPAD01V1 */
+
+cell (HGF011Q7E6_50V_GNDPAD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_MLDO ) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_RTCLDO ) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_HSE) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_BAT) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_PWS) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_CAP) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G15R_CAP) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_GNDPAD01V1 */
+
+cell (HGF011Q7E6_50V_VDDEPAD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15R_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_VDDEPAD01V1 */
+
+cell (HGF011Q7E6_50V_GNDEPAD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15R_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_GNDEPAD01V1 */
+
+cell (HGF011Q7E6_50V_VDDAPAD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50AE) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50AE) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15R_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_ADA) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_ADD) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_ADDA) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_ADCOM) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_ADVREFP) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_PORRES) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_OPACMPRES) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_PVD) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_TEMP) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_HSI) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_OPA) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_CMP) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_VDDAPAD01V1 */
+
+cell (HGF011Q7E6_50V_GNDAPAD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50AE) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50AE) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15R_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_ADA) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_ADD) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_ADDA) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_ADCOM) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_ADVREFN) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_VRNDUMMY) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_PVD) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_TEMP) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_HSI) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_OPA) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_OPACMPRES) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_CMP) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_GNDAPAD01V1 */
+
+cell (HGF011Q7E6_50V_VBATPAD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VBATE) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50E) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15R_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (VBAT_RES) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (VBAT_POR) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (VRTC) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_VBATPAD01V1 */
+
+cell (HGF011Q7E6_15V_V15VPAD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G50D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15R_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_IO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_15V_V15VPAD01V1 */
+
+cell (RCMCU_PLCORNER) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VDDH) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VSSH) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell RCMCU_PLCORNER */
+
+cell (HGF011Q7E6_50V_DIODE00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+}  /* end of cell HGF011Q7E6_50V_DIODE00V1 */
+
+cell (HGF011Q7E6_50V_PWS00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VBATE) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (BAT_EN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (POR_VBAT) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (POR_VRTC) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_PWS00V1 */
+
+cell (HGF011Q7E6_50V_PWS01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50E) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VBATE) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VRTC_PAD) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (VRTC_LDO) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (VRTC_LS) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PWS_BATEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PWS_POR_VBAT) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PWS_POR_VRTC) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_PWS01V1 */
+
+cell (HGF011Q7E6_50V_LDO03V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A_MLDO) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_LPLDO) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_RTCLDO) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_MLDO ) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_RTCLDO ) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_CAP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15R_CAP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LDO_MOK_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LDO_MOKB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LDO_RTCOK_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LDO_RTCOKB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_LDO03V1 */
+
+cell (HGF011Q7E6_50V_LDO04V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A_MLDO) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_RTCLDO) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_LPLDO) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VBAT_BG) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_BG) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_MLDO ) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_RTCLDO ) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D_CAP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15R_CAP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LDO_V15DPOR_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LDO_V15DPORB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LDO_V15RPOR_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LDO_V15RPORB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_LDO04V1 */
+
+cell (HGF011Q7E6_50V_IBIAS00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (IBIAS_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (IBIAS_EN_50V) {
+        bus_type       : "bus9";
+        pin (IBIAS_EN_50V[8]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_EN_50V[7]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_EN_50V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_EN_50V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_EN_50V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_EN_50V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_EN_50V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_EN_50V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_EN_50V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus IBIAS_EN_50V */
+
+  bus (IBIAS_IBP2UA_50V) {
+        bus_type       : "bus9";
+        pin (IBIAS_IBP2UA_50V[8]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_IBP2UA_50V[7]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_IBP2UA_50V[6]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_IBP2UA_50V[5]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_IBP2UA_50V[4]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_IBP2UA_50V[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_IBP2UA_50V[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_IBP2UA_50V[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (IBIAS_IBP2UA_50V[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus IBIAS_IBP2UA_50V */
+
+}  /* end of cell HGF011Q7E6_50V_IBIAS00V1 */
+
+cell (HGF011Q7E6_50V_VREF00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_VBGI) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_VTEMPI_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_V12TS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_TSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_V12EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_V20EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (VREF_V20CAL_15V) {
+        bus_type       : "bus4";
+        pin (VREF_V20CAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (VREF_V20CAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (VREF_V20CAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (VREF_V20CAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus VREF_V20CAL_15V */
+
+   pin (VREF_V12OUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_V20OUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (VREF_EN_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_VREF00V1 */
+
+cell (HGF011Q7E6_15V_V15DPOR1P2V00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D_OK_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (V15DPOR_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15DPORB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_15V_V15DPOR1P2V00V1 */
+
+cell (HGF011Q7E6_15V_V15RPOR1P2V00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R_OK_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (V15RPOR_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (V15RPORB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_15V_V15RPOR1P2V00V1 */
+
+cell (HGF011Q7E6_50V_PVD01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (PVD_VBGI) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PVD_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (PVDE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (PVDS_15V) {
+        bus_type       : "bus3";
+        pin (PVDS_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PVDS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PVDS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus PVDS_15V */
+
+  bus (PVDCAL_15V) {
+        bus_type       : "bus4";
+        pin (PVDCAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PVDCAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PVDCAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PVDCAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus PVDCAL_15V */
+
+   pin (PVDO_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PVDOB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PVDO_TEST_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORAE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (PORACAL_15V) {
+        bus_type       : "bus4";
+        pin (PORACAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORACAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORACAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORACAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus PORACAL_15V */
+
+  bus (PORDCAL_15V) {
+        bus_type       : "bus4";
+        pin (PORDCAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORDCAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORDCAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (PORDCAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus PORDCAL_15V */
+
+   pin (PORD_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORDB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORD_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORDB_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORD_TEST_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORA_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORAB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (PORA_TEST_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_PVD01V1 */
+
+cell (HGF011Q7E6_15V_FIL100NS00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (FIL_IN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (FIL_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (FIL_OUTB_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_15V_FIL100NS00V1 */
+
+cell (HGF011Q7E6_15V_FIL01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+  bus (FILS_15V) {
+        bus_type       : "bus3";
+        pin (FILS_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (FILS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (FILS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus FILS_15V */
+
+  bus (INSEL_15V) {
+        bus_type       : "bus2";
+        pin (INSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (INSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus INSEL_15V */
+
+   pin (IN0_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (IN1_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (IN2_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (IN3_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_15V_FIL01V1 */
+
+cell (HGF011Q7E6_50V_TEMP02V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (TS_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (TS_VBGI) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (TS_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (TS_CAL_15V) {
+        bus_type       : "bus5";
+        pin (TS_CAL_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (TS_CAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (TS_CAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (TS_CAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (TS_CAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus TS_CAL_15V */
+
+   pin (TS_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (TS_VTEMP_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (TS_EN_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_TEMP02V1 */
+
+cell (HGF011Q7E6_50V_AD12B02V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50DA) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50DA) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_COM) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_COM) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_VREFP) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_VREFN) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_VRNDUMMY) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_VBGI) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_CLK_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_PUMPEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_STOPB_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_SAMPLE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_SAMPLEOK_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_PUMPTIME_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (ADC_AIN_50V) {
+        bus_type       : "bus13";
+        pin (ADC_AIN_50V[12]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[11]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[10]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[9]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[8]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[7]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_AIN_50V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_AIN_50V */
+
+  bus (ADC_CHSEL_15V) {
+        bus_type       : "bus13";
+        pin (ADC_CHSEL_15V[12]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[11]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[10]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[9]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[8]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[7]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CHSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_CHSEL_15V */
+
+   pin (ADC_CALEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (ADC_CALVAL_15V) {
+        bus_type       : "bus7";
+        pin (ADC_CALVAL_15V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_CALVAL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_CALVAL_15V */
+
+  bus (ADC_ITRIM1_15V) {
+        bus_type       : "bus4";
+        pin (ADC_ITRIM1_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_ITRIM1_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_ITRIM1_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_ITRIM1_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_ITRIM1_15V */
+
+  bus (ADC_RES_15V) {
+        bus_type       : "bus2";
+        pin (ADC_RES_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (ADC_RES_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_RES_15V */
+
+  bus (ADC_DOUT_15V) {
+        bus_type       : "bus12";
+        pin (ADC_DOUT_15V[11]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[10]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[9]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[8]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[7]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[6]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[5]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[4]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (ADC_DOUT_15V[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus ADC_DOUT_15V */
+
+   pin (ADC_EOC_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_EN_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (ADC_PUMP_OUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_AD12B02V1 */
+
+cell (HGF011Q7E6_50V_BATDET01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VBAT) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GBAT) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VBAT_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (VBAT_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (VBAT_D2O_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_BATDET01V1 */
+
+cell (HGEE095LPT5_50V_MUX16CH2OUT01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (MUX_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (MUX_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (MUX_OUTS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (MUX_INS_15V) {
+        bus_type       : "bus4";
+        pin (MUX_INS_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_INS_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_INS_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_INS_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus MUX_INS_15V */
+
+  bus (MUX_AIN_50V) {
+        bus_type       : "bus16";
+        pin (MUX_AIN_50V[15]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[14]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[13]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[12]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[11]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[10]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[9]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[8]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[7]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[6]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (MUX_AIN_50V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus MUX_AIN_50V */
+
+   pin (MUX_OUT0_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (MUX_OUT1_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (MUX_OUTPBK_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGEE095LPT5_50V_MUX16CH2OUT01V1 */
+
+cell (HGF011Q7E6_LSL2H00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSEN_15R) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_LSL2H00V1 */
+
+cell (HGF011Q7E6_LSL2H01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSEN_15R) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_LSL2H01V1 */
+
+cell (HGF011Q7E6_LSL2H02V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_LSL2H02V1 */
+
+cell (HGF011Q7E6_LSL2H03V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSEN_15R) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUTB_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_LSL2H03V1 */
+
+cell (HGF011Q7E6_LSL2H04V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSEN_15R) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUTB_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_LSL2H04V1 */
+
+cell (HGF011Q7E6_LSH2L00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_LSH2L00V1 */
+
+cell (HGF011Q7E6_LSH2L01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSEN_15R) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_LSH2L01V1 */
+
+cell (HGF011Q7E6_LSH2L02V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSEN_15R) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_LSH2L02V1 */
+
+cell (HGF011Q7E6_50V_LSL2H00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50H) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN50L) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSEN_50H) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_LSL2H00V1 */
+
+cell (HGF011Q7E6_50V_LSL2H01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50H) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN50L) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSEN_50H) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_LSL2H01V1 */
+
+cell (HGF011Q7E6_50V_LSL2H02V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN50H) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN50) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN50L) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_LSL2H02V1 */
+
+cell (HGF011Q7E6_15V_LSL2H00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN15H) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN15) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15L) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSEN_15H) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_15V_LSL2H00V1 */
+
+cell (HGF011Q7E6_15V_LSL2H01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN15H) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN15) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15L) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSEN_15H) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_15V_LSL2H01V1 */
+
+cell (HGF011Q7E6_15V_LSL2H02V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (VIN15H) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (GIN15) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (VIN15L) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (LSIN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LSOUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_15V_LSL2H02V1 */
+
+cell (HGF011Q7E6_15V_ISOLATE01V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50D_PDR_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (RLS_VDD_REQ_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (RLS_STB_REQ_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (V15R_POR_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (V15D_POR_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (STDBY_MODE_FLAG_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (LDO_PD_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (ISO_OUT_V15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (ISO_OUTB_V15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (RLS_STB_ACK_V15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (RLS_STB_ACKB_V15R) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_15V_ISOLATE01V1 */
+
+cell (HGF011Q7E6_50V_OPA00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_CLRE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_CLRS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OPA_CLRN_15V) {
+        bus_type       : "bus6";
+        pin (OPA_CLRN_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_CLRN_15V */
+
+  bus (OPA_CLRP_15V) {
+        bus_type       : "bus6";
+        pin (OPA_CLRP_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_CLRP_15V */
+
+  bus (OPA_ITRIM1_15V) {
+        bus_type       : "bus3";
+        pin (OPA_ITRIM1_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM1_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM1_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_ITRIM1_15V */
+
+  bus (OPA_ITRIM2_15V) {
+        bus_type       : "bus3";
+        pin (OPA_ITRIM2_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM2_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM2_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_ITRIM2_15V */
+
+  bus (OPA_NSEL_15V) {
+        bus_type       : "bus2";
+        pin (OPA_NSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_NSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_NSEL_15V */
+
+  bus (OPA_GAIN_15V) {
+        bus_type       : "bus2";
+        pin (OPA_GAIN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_GAIN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_GAIN_15V */
+
+   pin (OPA_N_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_P_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_CLR_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_OUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_EN_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_OPA00V1 */
+
+cell (HGF011Q7E6_50V_OPA00V2) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_CLRE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_CLRS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OPA_CLRN_15V) {
+        bus_type       : "bus6";
+        pin (OPA_CLRN_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_CLRN_15V */
+
+  bus (OPA_CLRP_15V) {
+        bus_type       : "bus6";
+        pin (OPA_CLRP_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_CLRP_15V */
+
+  bus (OPA_ITRIM1_15V) {
+        bus_type       : "bus3";
+        pin (OPA_ITRIM1_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM1_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM1_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_ITRIM1_15V */
+
+  bus (OPA_ITRIM2_15V) {
+        bus_type       : "bus3";
+        pin (OPA_ITRIM2_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM2_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM2_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_ITRIM2_15V */
+
+  bus (OPA_NSEL_15V) {
+        bus_type       : "bus2";
+        pin (OPA_NSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_NSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_NSEL_15V */
+
+  bus (OPA_GAIN_15V) {
+        bus_type       : "bus2";
+        pin (OPA_GAIN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_GAIN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_GAIN_15V */
+
+   pin (OPA_N_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_P_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_CLR_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_OUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_EN_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_OPA00V2 */
+
+cell (HGF011Q7E6_50V_OPA00V3) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_CLRE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_CLRS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (OPA_CLRN_15V) {
+        bus_type       : "bus6";
+        pin (OPA_CLRN_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_CLRN_15V */
+
+  bus (OPA_CLRP_15V) {
+        bus_type       : "bus6";
+        pin (OPA_CLRP_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_CLRP_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_CLRP_15V */
+
+  bus (OPA_ITRIM1_15V) {
+        bus_type       : "bus3";
+        pin (OPA_ITRIM1_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM1_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM1_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_ITRIM1_15V */
+
+  bus (OPA_ITRIM2_15V) {
+        bus_type       : "bus3";
+        pin (OPA_ITRIM2_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM2_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_ITRIM2_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_ITRIM2_15V */
+
+  bus (OPA_NSEL_15V) {
+        bus_type       : "bus2";
+        pin (OPA_NSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_NSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_NSEL_15V */
+
+  bus (OPA_GAIN_15V) {
+        bus_type       : "bus2";
+        pin (OPA_GAIN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (OPA_GAIN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus OPA_GAIN_15V */
+
+   pin (OPA_N_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_P_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_CLR_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_OUT_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (OPA_EN_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_OPA00V3 */
+
+cell (HGF011Q7E6_50V_CMP00V1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V50A_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G50A_RES) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15A) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (V15R) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (CMP_VREFI_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP_IBN_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP_LSEN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP_EN_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP_CLRE_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP_CLRS_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (CMP_CLRN_15V) {
+        bus_type       : "bus6";
+        pin (CMP_CLRN_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_CLRN_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_CLRN_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_CLRN_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_CLRN_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_CLRN_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP_CLRN_15V */
+
+  bus (CMP_CLRP_15V) {
+        bus_type       : "bus6";
+        pin (CMP_CLRP_15V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_CLRP_15V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_CLRP_15V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_CLRP_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_CLRP_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_CLRP_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP_CLRP_15V */
+
+  bus (CMP_HYST_15V) {
+        bus_type       : "bus2";
+        pin (CMP_HYST_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_HYST_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP_HYST_15V */
+
+   pin (CMP_VOLT_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (CMP_VREFSEL_15V) {
+        bus_type       : "bus3";
+        pin (CMP_VREFSEL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_VREFSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_VREFSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP_VREFSEL_15V */
+
+  bus (CMP_PSEL_15V) {
+        bus_type       : "bus3";
+        pin (CMP_PSEL_15V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_PSEL_15V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_PSEL_15V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP_PSEL_15V */
+
+   pin (CMP_NSEL_15V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+   pin (CMP_N_50V) {
+           direction : input;
+           capacitance : 0.1;
+   }
+
+  bus (CMP_P_50V) {
+        bus_type       : "bus6";
+        pin (CMP_P_50V[5]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_P_50V[4]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_P_50V[3]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_P_50V[2]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_P_50V[1]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+        pin (CMP_P_50V[0]) {
+           direction : input;
+           capacitance : 0.1;
+        }
+   } /* end of bus CMP_P_50V */
+
+   pin (CMP_OUT_15V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+   pin (CMP_EN_50V) {
+           direction : output;
+           capacitance : 0.1;
+   }
+
+}  /* end of cell HGF011Q7E6_50V_CMP00V1 */
+
+cell (ID_1) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+  bus (OUT) {
+        bus_type       : "bus4";
+        pin (OUT[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus OUT */
+
+}  /* end of cell ID_1 */
+
+cell (VER_A) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+  bus (OUT) {
+        bus_type       : "bus4";
+        pin (OUT[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus OUT */
+
+}  /* end of cell VER_A */
+
+cell (VER_B) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+  bus (OUT) {
+        bus_type       : "bus4";
+        pin (OUT[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus OUT */
+
+}  /* end of cell VER_B */
+
+cell (VER_C) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+  bus (OUT) {
+        bus_type       : "bus4";
+        pin (OUT[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus OUT */
+
+}  /* end of cell VER_C */
+
+cell (VER_D) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+  bus (OUT) {
+        bus_type       : "bus4";
+        pin (OUT[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus OUT */
+
+}  /* end of cell VER_D */
+
+cell (VER_E) {
+
+   area            : 0;
+   dont_touch      : true;
+   dont_use        : true;
+   map_only        : true;
+
+   pin (V15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+   pin (G15D) {
+           direction : inout;
+           capacitance : 0.1;
+   }
+
+  bus (OUT) {
+        bus_type       : "bus4";
+        pin (OUT[3]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[2]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[1]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+        pin (OUT[0]) {
+           direction : output;
+           capacitance : 0.1;
+        }
+   } /* end of bus OUT */
+
+}  /* end of cell VER_E */
+
+}  /* end of library A800_ALL*/
