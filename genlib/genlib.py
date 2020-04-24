@@ -1,5 +1,7 @@
 # history:
 # 2020/4/18  v1.0  initial
+# 2020/4/21  v1.1  MAX_BUS_NUM = 16; header first line delete a '/'
+# 2020/4/24  v1.2  add AIO, DIO pin type
 
 
 import os
@@ -12,11 +14,12 @@ import pandas as pd
 from PyQt5 import QtWidgets
 from myform import Ui_Form
 
-VERSION = '1.0'
+VERSION = '1.2'
 
 VALID_COLS = ['管脚方向', '管脚名']
-VALID_PIN_TYPE = ['POWER', 'AI', 'AO', 'DI', 'DO']
-MAX_BUS_NUM = 15
+VALID_PIN_TYPE = ['POWER', 'AI', 'AO', 'AIO', 'DI', 'DO', 'DIO']
+MAX_BUS_NUM = 16
+
 
 class MyWindow(QtWidgets.QWidget, Ui_Form):
     def __init__(self):
@@ -27,15 +30,15 @@ class MyWindow(QtWidgets.QWidget, Ui_Form):
         xls_file_name = self.txt_xls_file.text()
         lib_name = self.txt_lib_name.text()
 
-        if xls_file_name=='':
+        if xls_file_name == '':
             info = 'excel文件名为空'
             QtWidgets.QMessageBox.warning(self, '出错', info)
             return
 
-        if lib_name=='':
+        if lib_name == '':
             info = 'Lib名为空'
             QtWidgets.QMessageBox.warning(self, '出错', info)
-            return 
+            return
 
         ret = xls_to_lib(xls_file_name, lib_name)
 
@@ -68,7 +71,7 @@ def bus_type_define(f, num):
 
 
 def write_header(f, lib_name):
-    f.write('//*******************************************************************************\n')
+    f.write('/*******************************************************************************\n')
     f.write('// Library Name    : %s\n' % lib_name)
     f.write('// Modified Date   : %s\n' %
             datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))

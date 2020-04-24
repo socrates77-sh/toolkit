@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['genlib.py'],
-             pathex=['E:\\temp\\genlib'],
+             pathex=['E:\\py\\toolkit\\genlib'],
              binaries=[],
              datas=[],
              hiddenimports=[],
