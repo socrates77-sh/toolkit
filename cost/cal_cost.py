@@ -1,6 +1,7 @@
 # history:
 # 2020/4/12  v1.0  initial
 # 2020/4/13  v1.1  output 2 sheets
+# 2020/5/11  v1.2  add exception check
 
 
 import os
@@ -17,7 +18,7 @@ from openpyxl.styles import colors, Font, Color, Border, Side, Alignment, Patter
 from PyQt5 import QtWidgets
 from myform import Ui_Form
 
-VERSION = '1.1'
+VERSION = '1.2'
 # IS_FAMILY = True
 
 INX_NAME_WORK_LOAD = 3
@@ -44,14 +45,31 @@ def clean_work_load(df_work_load):
 
 
 def clean_detail_cost(df_detail_cost):
-    valid_columns = df_detail_cost.columns.values[INX_NAME_DETAIL_COST:-1]
+    # valid_columns = df_detail_cost.columns.values[INX_NAME_DETAIL_COST:-1]
+    valid_columns = df_detail_cost.columns.values[INX_NAME_DETAIL_COST:]
     df = df_detail_cost[valid_columns]
     return df
+
+
+class ExcelDataException(Exception):
+    pass
+    # def __init__(self, msg):
+    #     self.msg = msg
+
+    # def __str__(self):
+    #     msg = '费用明细表的人员未出现在人员分摊表中: %s' % self.msg
+    #     return(str)
 
 
 def sum_cost(df_work_load, df_detail_cost):
     colunms = df_work_load.columns
     df_used_work_load = df_work_load.loc[df_detail_cost.index.values]
+    person_in_cost = set(df_detail_cost.index.values)
+    person_in_load = set(df_work_load.index.values)
+    person_missed = person_in_cost-(person_in_cost & person_in_load)
+    if len(person_missed) > 0:
+        msg = '费用明细表的人员未出现在人员分摊表中: %s' % person_missed
+        raise ExcelDataException(msg)
     items = df_detail_cost.columns.values
     df = pd.DataFrame(columns=colunms, index=items)
     for i in range(len(items)):
@@ -131,7 +149,8 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
 
         df_sum_cost = sum_cost(df_work_load, df_detail_cost)
 
-        xls_file_name = 'summary_%s.xlsx' % datetime.datetime.now().date().strftime('%y%m%d')
+        xls_file_name = '%s汇总_%s.xlsx' % (
+            detail_cost_sheet, datetime.datetime.now().date().strftime('%y%m%d'))
         report_xls(xls_file_name, work_load_sheet,
                    df_sum_cost)
     except Exception as e:
