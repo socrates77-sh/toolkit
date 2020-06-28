@@ -4,6 +4,7 @@
 # 2019/3/27   v1.2  get cookies from chrome automatically
 # 2019/3/28   v1.3  add input function
 # 2019/5/29   v1.4  revise header bug
+# 2020/6/28   v1.5  cookie update
 
 import csv
 import datetime
@@ -20,7 +21,7 @@ import requests
 import sqlite3
 from win32.win32crypt import CryptUnprotectData
 
-VERSION = '1.4'
+VERSION = '1.5'
 URL_TDIS_TOP = 'http://online.hhgrace.com/web/get_treeList_ztree.tdis'
 URL = 'http://online.hhgrace.com/web/get_docList_search.tdis?treeNodeId=%s&userId=2c9e498b48a7386f0148ac31c83f0108&description=0.11um/F011Q7E8/Design%20Rule/Platform/'
 HEADERS = {
@@ -255,8 +256,10 @@ def main():
     # print(cookies['monitor_count'])
     # cookies_value = 'JSESSIONID=%s' % cookies['JSESSIONID']
     # print(cookies_value)
-    cookies_value = '__guid=%s; JSESSIONID=%s; monitor_count=%s' % (
-        cookies['__guid'], cookies['JSESSIONID'], cookies['monitor_count'])
+    # cookies_value = '__guid=%s; JSESSIONID=%s; monitor_count=%s' % (
+    #     cookies['__guid'], cookies['JSESSIONID'], cookies['monitor_count'])
+    cookies_value = 'standard_style=%s;__guid=%s; JSESSIONID=%s' % (
+        cookies['standard_style'], cookies['__guid'], cookies['JSESSIONID'])
     HEADERS = {'Cookie': cookies_value}
 
     docs = DocsTree(URL_TDIS_TOP, HEADERS)
