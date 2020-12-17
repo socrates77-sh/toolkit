@@ -96,10 +96,15 @@ def sum_cost(df_work_load, df_detail_cost):
         narray3.append(loc)
         narray4.append(family)
 
+        # print(name, department, loc, family)
+
     new_index = [np.array(narray1), np.array(narray2),
                  np.array(narray3), np.array(narray4)]
+    # print(new_index)
+    # print(valid_columns)
     df = pd.DataFrame(columns=valid_columns,
                       index=new_index)
+    # print(df)
 
     df.index.names = ['员工', info_colunms[0], info_colunms[1], '分类']
 
@@ -107,6 +112,8 @@ def sum_cost(df_work_load, df_detail_cost):
         name = item[0]
         family = item[3]
         value = df_used_work_load_classified.loc[(name, family)]
+        # print(name)
+        # print(df_detail_cost[valid_columns].loc[name])
         df.loc[item] = value*df_detail_cost[valid_columns].loc[name]
 
     return df
@@ -242,7 +249,7 @@ class MyWindow(QtWidgets.QWidget, Ui_Form):
             self.txt_detail_cost.setText(file_name)
 
 
-def main():
+def main1():
     app = QtWidgets.QApplication(sys.argv)
     myshow = MyWindow()
     myshow.setWindowTitle('cal_cost v%s' % VERSION)
@@ -250,12 +257,12 @@ def main():
     sys.exit(app.exec_())
 
 
-def main1():
-    work_load_file = r'E:\py\toolkit\cost\人员费用分摊.xlsx'
-    work_load_sheet = '4月'
-    detail_cost_file = r'E:\py\toolkit\cost\4月工时分摊表 - 副本(1).xlsx'
-    # detail_cost_sheet = '社保'
-    detail_cost_sheet = '公积金'
+def main():
+    work_load_file = r'E:\py\toolkit\cost\2020人员工时分摊2.xlsx'
+    work_load_sheet = '8月'
+    detail_cost_file = r'E:\py\toolkit\cost\工时分摊表资料模板2.xlsx'
+    detail_cost_sheet = '社保'
+    # detail_cost_sheet = '公积金'
     detail_cost_sheet = '工资'
 
     # ret = backend_proc(work_load_file, work_load_sheet,
@@ -267,11 +274,11 @@ def main1():
         detail_cost_file, sheet_name=detail_cost_sheet,
         index_col=INX_NAME_DETAIL_COST)
 
-    print(df_detail_cost)
-
     df_work_load = clean_work_load(df_work_load)
     df_detail_cost = clean_detail_cost(df_detail_cost)
 
+    # print(df_detail_cost)
+    # print(df_work_load)
     df_sum_cost = sum_cost(df_work_load, df_detail_cost)
 
     xls_file_name = '%s汇总_%s.xlsx' % (

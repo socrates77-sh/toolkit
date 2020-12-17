@@ -65,6 +65,6 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", "Form"))
         self.label.setText(_translate("Form", "IP列表Excel文件"))
         self.tbt_load_file.setText(_translate("Form", "..."))
-        self.label_2.setText(_translate("Form", "输出Lib文件名"))
+        self.label_2.setText(_translate("Form", "输出lib/v文件名"))
         self.btn_confirm.setText(_translate("Form", "确定"))
         self.btn_close.setText(_translate("Form", "关闭"))

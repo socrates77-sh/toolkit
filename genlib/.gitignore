@@ -1,0 +1,4 @@
+*.xls*
+__pycache__
+build
+dist
