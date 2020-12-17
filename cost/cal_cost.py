@@ -3,6 +3,7 @@
 # 2020/4/13  v1.1  output 2 sheets
 # 2020/5/11  v1.2  add exception check
 # 2020/5/11  v2.0  change output scheme
+# 2020/12/17 v2.1  add project sheet
 
 
 import os
@@ -20,7 +21,7 @@ from openpyxl.styles import colors, Font, Color, Border, Side, Alignment, Patter
 from PyQt5 import QtWidgets
 from myform import Ui_Form
 
-VERSION = '2.0'
+VERSION = '2.1'
 # IS_FAMILY = True
 
 INX_NAME_WORK_LOAD = 3
@@ -64,7 +65,7 @@ class ExcelDataException(Exception):
     #     return(str)
 
 
-def sum_cost(df_work_load, df_detail_cost):
+def sum_cost_by_family(df_work_load, df_detail_cost):
     colunms = df_work_load.columns
     df_used_work_load = df_work_load.loc[df_detail_cost.index.values]
     person_in_cost = set(df_detail_cost.index.values)
@@ -119,17 +120,73 @@ def sum_cost(df_work_load, df_detail_cost):
     return df
 
 
+def sum_cost_by_proj(df_work_load, df_detail_cost):
+    colunms = df_work_load.columns
+    df_used_work_load = df_work_load.loc[df_detail_cost.index.values]
+    person_in_cost = set(df_detail_cost.index.values)
+    person_in_load = set(df_work_load.index.values)
+    person_missed = person_in_cost-(person_in_cost & person_in_load)
+    if len(person_missed) > 0:
+        msg = '费用明细表的人员未出现在人员分摊表中: %s' % person_missed
+        raise ExcelDataException(msg)
+
+    # df_used_work_load_classified = df_used_work_load.sum(
+    #     level=0, axis=1).T.unstack()
+    sr_used_work_load_classified = df_used_work_load.stack([0, 1])
+
+    valid_columns = df_detail_cost.columns.values[2:]
+    info_colunms = df_detail_cost.columns.values[0:2]
+
+    narray1 = []
+    narray2 = []
+    narray3 = []
+    narray4 = []
+    narray5 = []
+
+    for item in sr_used_work_load_classified.index.values:
+        # print(item)
+        name = item[0]
+        department = df_detail_cost.loc[name, info_colunms[0]]
+        loc = df_detail_cost.loc[name, info_colunms[1]]
+        family = item[1]
+        proj = item[2]
+        narray1.append(name)
+        narray2.append(department)
+        narray3.append(loc)
+        narray4.append(family)
+        narray5.append(proj)
+
+        # print(name, department, loc, family, proj)
+
+    new_index = [np.array(narray1), np.array(narray2),
+                 np.array(narray3), np.array(narray4), np.array(narray5)]
+    df = pd.DataFrame(columns=valid_columns, index=new_index)
+
+    df.index.names = ['员工', info_colunms[0], info_colunms[1], '分类', '项目']
+
+    for item in df.index.values:
+        name = item[0]
+        family = item[3]
+        proj = item[4]
+        value = sr_used_work_load_classified.loc[(name, family, proj)]
+        # print(name)
+        # print(df_detail_cost[valid_columns].loc[name])
+        df.loc[item] = value*df_detail_cost[valid_columns].loc[name]
+
+    return df
+
+
 def format_xls(xls_file_name, sheet_name, is_family):
     workbook = openpyxl.load_workbook(xls_file_name)
     ws = workbook[sheet_name]
 
     if is_family:
-        header_row = 1
+        header_col = 4
     else:
-        header_row = 2
-        ws.delete_rows(3)
+        header_col = 5
+        # ws.delete_rows(3)
 
-    header_col = 4
+    header_row = 1
 
     nrows = ws.max_row
     ncols = ws.max_column
@@ -170,19 +227,24 @@ def format_xls(xls_file_name, sheet_name, is_family):
     workbook.save(filename=xls_file_name)
 
 
-def report_xls(xls_file_name, sheet_name, df_sum_cost):
+def report_xls(xls_file_name, sheet_name, df_sum_cost_by_family, df_sum_cost_by_proj):
     sheet_name_family = '%s-大类' % sheet_name
-    # sheet_name_proj = '%s-项目' % sheet_name
+    sheet_name_proj = '%s-项目' % sheet_name
 
     with pd.ExcelWriter(xls_file_name) as xlsx:
         # df = df_sum_cost.sum(level=0, axis=1)
-        df = df_sum_cost
+        # print(df_sum_cost_by_proj.index.values)
+        # print(df_sum_cost_by_proj.index)
+        # df = df_sum_cost_by_proj.groupby(level=3, axis=0).mean()
+        df = df_sum_cost_by_family
+        # print(df)
+        # print(df.index.values)
         df.to_excel(xlsx, sheet_name=sheet_name_family, merge_cells=False)
-        # df = df_sum_cost
-        # df.to_excel(xlsx, sheet_name=sheet_name_proj)
+        df = df_sum_cost_by_proj
+        df.to_excel(xlsx, sheet_name=sheet_name_proj, merge_cells=False)
 
     format_xls(xls_file_name, sheet_name_family, is_family=True)
-    # format_xls(xls_file_name, sheet_name_proj, is_family=False)
+    format_xls(xls_file_name, sheet_name_proj, is_family=False)
 
 
 def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_sheet):
@@ -196,12 +258,22 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
         df_work_load = clean_work_load(df_work_load)
         df_detail_cost = clean_detail_cost(df_detail_cost)
 
-        df_sum_cost = sum_cost(df_work_load, df_detail_cost)
+        df_sum_cost_by_family = sum_cost_by_family(
+            df_work_load, df_detail_cost)
+        df_sum_cost_by_proj = sum_cost_by_proj(df_work_load, df_detail_cost)
 
         xls_file_name = '%s汇总_%s.xlsx' % (
             detail_cost_sheet, datetime.datetime.now().date().strftime('%y%m%d'))
         report_xls(xls_file_name, work_load_sheet,
-                   df_sum_cost)
+                   df_sum_cost_by_family, df_sum_cost_by_proj)
+
+        # # df_sum_cost_by_family = sum_cost_by_family(
+        # #     df_work_load, df_detail_cost)
+
+        # xls_file_name = '%s汇总_%s.xlsx' % (
+        #     detail_cost_sheet, datetime.datetime.now().date().strftime('%y%m%d'))
+        # # report_xls(xls_file_name, work_load_sheet,
+        # #            df_sum_cost_by_family)
     except Exception as e:
         return e
     return(xls_file_name)
@@ -249,7 +321,7 @@ class MyWindow(QtWidgets.QWidget, Ui_Form):
             self.txt_detail_cost.setText(file_name)
 
 
-def main1():
+def main():
     app = QtWidgets.QApplication(sys.argv)
     myshow = MyWindow()
     myshow.setWindowTitle('cal_cost v%s' % VERSION)
@@ -257,7 +329,7 @@ def main1():
     sys.exit(app.exec_())
 
 
-def main():
+def main1():
     work_load_file = r'E:\py\toolkit\cost\2020人员工时分摊2.xlsx'
     work_load_sheet = '8月'
     detail_cost_file = r'E:\py\toolkit\cost\工时分摊表资料模板2.xlsx'
@@ -279,12 +351,14 @@ def main():
 
     # print(df_detail_cost)
     # print(df_work_load)
-    df_sum_cost = sum_cost(df_work_load, df_detail_cost)
+    df_sum_cost_by_family = sum_cost_by_family(df_work_load, df_detail_cost)
+    df_sum_cost_by_proj = sum_cost_by_proj(df_work_load, df_detail_cost)
+    # print(df_sum_cost_by_proj)
 
     xls_file_name = '%s汇总_%s.xlsx' % (
         detail_cost_sheet, datetime.datetime.now().date().strftime('%y%m%d'))
     report_xls(xls_file_name, work_load_sheet,
-               df_sum_cost)
+               df_sum_cost_by_family, df_sum_cost_by_proj)
 
 
 if __name__ == '__main__':
