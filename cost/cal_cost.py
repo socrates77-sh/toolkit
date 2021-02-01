@@ -4,14 +4,13 @@
 # 2020/5/11  v1.2  add exception check
 # 2020/5/11  v2.0  change output scheme
 # 2020/12/17 v2.1  add project sheet
+# 2020/12/27 v3.0  re-design
 
 
 import os
 import sys
 import msvcrt
 import datetime
-# import xlwt
-# import xlrd
 import pandas as pd
 import numpy as np
 
@@ -21,11 +20,16 @@ from openpyxl.styles import colors, Font, Color, Border, Side, Alignment, Patter
 from PyQt5 import QtWidgets
 from myform import Ui_Form
 
-VERSION = '2.1'
-# IS_FAMILY = True
+import traceback
 
-INX_NAME_WORK_LOAD = 3
+VERSION = '3.0'
+IS_WINDOW = False
+IS_WINDOW = True
+
+INX_NAME_WORK_LOAD = 4
 INX_NAME_DETAIL_COST = 1
+SH_COMPANY = ['上海']
+GD_COMPANY = ['广上', '广州', '广深']
 
 
 def print_version(version):
@@ -40,10 +44,12 @@ def wait_any_key():
 
 
 def clean_work_load(df_work_load):
-    valid_columns = df_work_load.columns.values[INX_NAME_WORK_LOAD:-2]
+    valid_columns = df_work_load.columns.values[INX_NAME_WORK_LOAD-1:-2]
     df = df_work_load[valid_columns]
-    df = df.set_index(valid_columns[0])
+    df = df.set_index(valid_columns[1])
     df = df.fillna(0)
+    index_name = df.index.name[0]
+    df.index.name = index_name
     return df
 
 
@@ -51,231 +57,301 @@ def clean_detail_cost(df_detail_cost):
     # valid_columns = df_detail_cost.columns.values[INX_NAME_DETAIL_COST:-1]
     valid_columns = df_detail_cost.columns.values[INX_NAME_DETAIL_COST:]
     df = df_detail_cost[valid_columns]
+    df = df.set_index(valid_columns[0])
     df = df.fillna(0)
     return df
 
 
-class ExcelDataException(Exception):
-    pass
-    # def __init__(self, msg):
-    #     self.msg = msg
+def check_data(df_work_load, df_detail_cost):
+    df = df_work_load.copy()
 
-    # def __str__(self):
-    #     msg = '费用明细表的人员未出现在人员分摊表中: %s' % self.msg
-    #     return(str)
+    df = df_work_load.copy()
+    col_attr = df.columns[0]
+    s = (df[col_attr] == '研发') | (df[col_attr] == '非研发')
+    if s.all() == False:
+        txt = '<工时比例>：属性只能为“研发” “非研发”'
+        raise Exception(txt)
 
+    df1 = df.iloc[:, 1:]
+    df1 = df1.select_dtypes(exclude=['float64', 'int64'])
+    if not df1.empty:
+        txt = df1.columns.values
+        raise Exception('<工时比例>%s: 有非法值(not float64/int64)' % txt)
+        # return '<工时比例>%s: 有非法值(not float64)' % txt
 
-def sum_cost_by_family(df_work_load, df_detail_cost):
-    colunms = df_work_load.columns
-    df_used_work_load = df_work_load.loc[df_detail_cost.index.values]
+    df1 = df_work_load.sum(axis=1)
+    criteria = (df1 < 0.9999) | (df1 > 1.00001)
+    if criteria.any():
+        txt = df1[criteria].index.values
+        raise Exception('<工时比例>%s: 合计不是100%%' % txt)
+
+    col_attr = df.columns[0]
+    df1 = df[df[col_attr] != '研发'].iloc[:, -1:]
+    criteria = (df1 < 0.9999) | (df1 > 1.00001)
+    s_criteria = criteria.T.iloc[0]
+    if s_criteria.any():
+        txt = df1[s_criteria].index.values
+        raise Exception('<工时比例>%s: 非研发类“其他”不为100%%' % txt)
+
+    col_attr = df.columns[0]
+    df1 = df[df[col_attr] == '研发'].iloc[:, -1:]
+    criteria = (df1 < -0.00001) | (df1 > 0.00001)
+    s_criteria = criteria.T.iloc[0]
+    if s_criteria.any():
+        txt = df1[s_criteria].index.values
+        raise Exception('<工时比例>%s: 研发类“其他”不为0%%' % txt)
+
+    df = df_detail_cost.copy()
+    s1 = df.index.names != ['姓名']
+    s2 = df.columns.to_list()[0:2] != ['部门', '支付归口']
+    if s1 or s2:
+        txt = '<费用明细>：列标题应该为“姓名” “部门” “支付归口”'
+        raise Exception(txt)
+
+    df1 = df.iloc[:, 2:]
+    df1 = df1.select_dtypes(exclude=['float64', 'int64'])
+    if not df1.empty:
+        txt = df1.columns.values
+        raise Exception('<费用明细>%s: 有非法值(not float64/int64)' % txt)
+
     person_in_cost = set(df_detail_cost.index.values)
     person_in_load = set(df_work_load.index.values)
+    person_missed = person_in_load-(person_in_cost & person_in_load)
+    if len(person_missed) > 0:
+        txt = '<工时比例>人员未出现<费用明细>中: %s' % person_missed
+        raise Exception(txt)
+
     person_missed = person_in_cost-(person_in_cost & person_in_load)
     if len(person_missed) > 0:
-        msg = '费用明细表的人员未出现在人员分摊表中: %s' % person_missed
-        raise ExcelDataException(msg)
+        txt = '<费用明细>人员未出现<工时比例>中: %s' % person_missed
+        raise Exception(txt)
 
-    df_used_work_load_classified = df_used_work_load.sum(
-        level=0, axis=1).T.unstack()
+    if len(person_in_load) != len(df_work_load.index.values):
+        txt = '<工时比例>中有重复的员工名'
+        raise Exception(txt)
 
-    valid_columns = df_detail_cost.columns.values[2:]
-    info_colunms = df_detail_cost.columns.values[0:2]
-    # df_detail_valid_cost = df_detail_cost[valid_columns]
+    if len(person_in_cost) != len(df_detail_cost.index.values):
+        txt = '<费用明细>中有重复的员工名'
+        raise Exception(txt)
 
-    narray1 = []
-    narray2 = []
-    narray3 = []
-    narray4 = []
-    for item in df_used_work_load_classified.index.values:
-        # print(item)
-        name = item[0]
-        department = df_detail_cost.loc[name, info_colunms[0]]
-        loc = df_detail_cost.loc[name, info_colunms[1]]
-        family = item[1]
-        narray1.append(name)
-        narray2.append(department)
-        narray3.append(loc)
-        narray4.append(family)
 
-        # print(name, department, loc, family)
+# class ExcelDataException(Exception):
+#     pass
+#     # def __init__(self, msg):
+#     #     self.msg = msg
 
-    new_index = [np.array(narray1), np.array(narray2),
-                 np.array(narray3), np.array(narray4)]
-    # print(new_index)
-    # print(valid_columns)
-    df = pd.DataFrame(columns=valid_columns,
-                      index=new_index)
-    # print(df)
+#     # def __str__(self):
+#     #     msg = '费用明细表的人员未出现在人员分摊表中: %s' % self.msg
+#     #     return(str)
 
-    df.index.names = ['员工', info_colunms[0], info_colunms[1], '分类']
 
-    for item in df.index.values:
-        name = item[0]
-        family = item[3]
-        value = df_used_work_load_classified.loc[(name, family)]
-        # print(name)
-        # print(df_detail_cost[valid_columns].loc[name])
-        df.loc[item] = value*df_detail_cost[valid_columns].loc[name]
+def flatten_work_load_rd(df_work_load_rd, df_detail_cost):
+    df = df_work_load_rd.iloc[:, :-1]
+    sr = df.stack([0, 1, 2])
+    index_v = sr.index.values
+    val = sr.to_list()
+    new_index = []
+    for idx in index_v:
+        dept = df_detail_cost.loc[idx[0], '部门']
+        loc = df_detail_cost.loc[idx[0], '支付归口']
+        new_idx = (idx[0], dept, loc, idx[1], idx[2], idx[3])
+        new_index.append(new_idx)
 
+    index = pd.MultiIndex.from_tuples(new_index)
+    sr_new = pd.Series(val, index=index)
+    sr_new.index.names = ['人员', '部门', '属地', '大类', '项目', '项目归属']
+    return sr_new
+
+
+def nrd_entire(df_work_load_nrd, df_detail_cost):
+    nrd_name = df_work_load_nrd.index.values
+    df = df_detail_cost.loc[nrd_name]
+    df['大类'] = '其他'
+    df['项目'] = '0000'
+    df['项目归属'] = ''
+    df = df.reset_index()
+    df = df.set_index(['姓名', '部门', '支付归口', '大类', '项目', '项目归属'])
+    df.index.names = ['人员', '部门', '属地', '大类', '项目', '项目归属']
     return df
 
 
-def sum_cost_by_proj(df_work_load, df_detail_cost):
-    colunms = df_work_load.columns
-    df_used_work_load = df_work_load.loc[df_detail_cost.index.values]
-    person_in_cost = set(df_detail_cost.index.values)
-    person_in_load = set(df_work_load.index.values)
-    person_missed = person_in_cost-(person_in_cost & person_in_load)
-    if len(person_missed) > 0:
-        msg = '费用明细表的人员未出现在人员分摊表中: %s' % person_missed
-        raise ExcelDataException(msg)
-
-    # df_used_work_load_classified = df_used_work_load.sum(
-    #     level=0, axis=1).T.unstack()
-    sr_used_work_load_classified = df_used_work_load.stack([0, 1])
-
-    valid_columns = df_detail_cost.columns.values[2:]
-    info_colunms = df_detail_cost.columns.values[0:2]
-
-    narray1 = []
-    narray2 = []
-    narray3 = []
-    narray4 = []
-    narray5 = []
-
-    for item in sr_used_work_load_classified.index.values:
-        # print(item)
-        name = item[0]
-        department = df_detail_cost.loc[name, info_colunms[0]]
-        loc = df_detail_cost.loc[name, info_colunms[1]]
-        family = item[1]
-        proj = item[2]
-        narray1.append(name)
-        narray2.append(department)
-        narray3.append(loc)
-        narray4.append(family)
-        narray5.append(proj)
-
-        # print(name, department, loc, family, proj)
-
-    new_index = [np.array(narray1), np.array(narray2),
-                 np.array(narray3), np.array(narray4), np.array(narray5)]
-    df = pd.DataFrame(columns=valid_columns, index=new_index)
-
-    df.index.names = ['员工', info_colunms[0], info_colunms[1], '分类', '项目']
-
-    for item in df.index.values:
-        name = item[0]
-        family = item[3]
-        proj = item[4]
-        value = sr_used_work_load_classified.loc[(name, family, proj)]
-        # print(name)
-        # print(df_detail_cost[valid_columns].loc[name])
-        df.loc[item] = value*df_detail_cost[valid_columns].loc[name]
-
+def rd_entire_before_adj(df_work_load_rd, df_detail_cost):
+    sr = flatten_work_load_rd(df_work_load_rd, df_detail_cost)
+    df_cost = df_detail_cost.iloc[:, 2:]
+    df = df_cost.mul(sr, axis='index', level=0)
     return df
 
 
-def format_xls(xls_file_name, sheet_name, is_family):
-    workbook = openpyxl.load_workbook(xls_file_name)
+def rd_entire_after_adj(df_rd_bf_adj):
+    df = df_rd_bf_adj
+    # sum_all = df.sum().sum()
+    sum_sh_emp = df.groupby(['属地']).sum().loc[SH_COMPANY].sum().sum()
+    sum_gd_emp = df.groupby(['属地']).sum().loc[GD_COMPANY].sum().sum()
+    sum_sh_prj = df.groupby(['项目归属']).sum().loc['上海'].sum().sum()
+    sum_gd_prj = df.groupby(['项目归属']).sum().loc['广东'].sum().sum()
+
+    ratio_sh = sum_sh_emp/sum_sh_prj
+    ratio_gd = sum_gd_emp/sum_gd_prj
+    df_sh_prj = df.loc[(slice(None), slice(None), slice(
+        None), slice(None), slice(None), ['上海']), :].mul(ratio_sh)
+    df_gd_prj = df.loc[(slice(None), slice(None), slice(
+        None), slice(None), slice(None), ['广东']), :].mul(ratio_gd)
+    df_merge = pd.concat([df_sh_prj, df_gd_prj])
+    return df_merge
+
+
+def format_xlsx(workbook, sheet_name):
     ws = workbook[sheet_name]
 
-    if is_family:
-        header_col = 4
-    else:
-        header_col = 5
-        # ws.delete_rows(3)
-
-    header_row = 1
+    font = Font(name='Arial', size=10, color=colors.BLACK)
+    hd_font = Font(name='Arial', size=10, color=colors.BLACK, bold=True)
+    thin = Side(border_style="thin")
+    border = Border(top=thin, left=thin, right=thin, bottom=thin)
+    alignment = Alignment(horizontal="center", vertical="center")
+    fill = PatternFill(fill_type="solid", fgColor="C1CDC1")
 
     nrows = ws.max_row
     ncols = ws.max_column
 
-    font = Font(name='Arial', size=10, color=colors.BLACK)
-    hd_font = Font(name='Arial', size=10, color=colors.BLACK, bold=True)
-
-    thin = Side(border_style="thin")
-    border = Border(top=thin, left=thin, right=thin, bottom=thin)
-
-    alignment = Alignment(horizontal="center", vertical="center")
-
-    fill = PatternFill(fill_type="solid", fgColor="C1CDC1")
-
-    for row in ws.rows:
-        for cell in row:
-            cell.font = font
+    for i in range(nrows):
+        for j in range(ncols):
+            cell = ws.cell(i+1, j+1)
+            cell.number_format = '0.00'
             cell.border = border
             cell.alignment = alignment
-
-    for i in range(header_row):
-        for cell in list(ws.rows)[i]:
-            cell.font = hd_font
-            cell.fill = fill
-
-    for i in range(header_col):
-        for cell in list(ws.columns)[i]:
-            cell.font = hd_font
-            cell.fill = fill
-
-    for i in range(header_row, nrows):
-        for j in range(header_col, ncols):
-            ws.cell(i+1, j+1).number_format = '0.00'
-
-    ws.column_dimensions['B'].width = 20.0
-    ws.column_dimensions['D'].width = 15.0
-
-    workbook.save(filename=xls_file_name)
+            if(cell.font.b):
+                cell.font = hd_font
+                cell.fill = fill
+            else:
+                cell.font = font
 
 
-def report_xls(xls_file_name, sheet_name, df_sum_cost_by_family, df_sum_cost_by_proj):
-    sheet_name_family = '%s-大类' % sheet_name
-    sheet_name_proj = '%s-项目' % sheet_name
-
-    with pd.ExcelWriter(xls_file_name) as xlsx:
-        # df = df_sum_cost.sum(level=0, axis=1)
-        # print(df_sum_cost_by_proj.index.values)
-        # print(df_sum_cost_by_proj.index)
-        # df = df_sum_cost_by_proj.groupby(level=3, axis=0).mean()
-        df = df_sum_cost_by_family
-        # print(df)
-        # print(df.index.values)
-        df.to_excel(xlsx, sheet_name=sheet_name_family, merge_cells=False)
-        df = df_sum_cost_by_proj
-        df.to_excel(xlsx, sheet_name=sheet_name_proj, merge_cells=False)
-
-    format_xls(xls_file_name, sheet_name_family, is_family=True)
-    format_xls(xls_file_name, sheet_name_proj, is_family=False)
+def write_xlsx(df, xlsx, title, month):
+    sheet_name = '%s-%s' % (month, title)
+    df.to_excel(xlsx, sheet_name=sheet_name, merge_cells=False)
 
 
-def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_sheet):
+def show_win_title(myshow, win_title, info):
+    txt = '%s [%s]' % (win_title, info)
+    myshow.setWindowTitle(txt)
+
+
+def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_sheet, myshow):
     try:
-        df_work_load = pd.read_excel(
-            work_load_file, sheet_name=work_load_sheet,  header=[0, 1])
-        df_detail_cost = pd.read_excel(
-            detail_cost_file, sheet_name=detail_cost_sheet,
-            index_col=INX_NAME_DETAIL_COST)
-
-        df_work_load = clean_work_load(df_work_load)
-        df_detail_cost = clean_detail_cost(df_detail_cost)
-
-        df_sum_cost_by_family = sum_cost_by_family(
-            df_work_load, df_detail_cost)
-        df_sum_cost_by_proj = sum_cost_by_proj(df_work_load, df_detail_cost)
+        if(IS_WINDOW):
+            win_title = myshow.windowTitle()
+            info = '开始'
+            show_win_title(myshow, win_title, info)
 
         xls_file_name = '%s汇总_%s.xlsx' % (
             detail_cost_sheet, datetime.datetime.now().date().strftime('%y%m%d'))
-        report_xls(xls_file_name, work_load_sheet,
-                   df_sum_cost_by_family, df_sum_cost_by_proj)
 
-        # # df_sum_cost_by_family = sum_cost_by_family(
-        # #     df_work_load, df_detail_cost)
+        if(IS_WINDOW):
+            info = '读取文件'
+            show_win_title(myshow, win_title, info)
+        df_work_load = pd.read_excel(
+            work_load_file, sheet_name=work_load_sheet,  header=[0, 1, 2])
+        df_detail_cost = pd.read_excel(
+            detail_cost_file, sheet_name=detail_cost_sheet)
+        df_work_load = clean_work_load(df_work_load)
+        df_detail_cost = clean_detail_cost(df_detail_cost)
+        check_data(df_work_load, df_detail_cost)
 
-        # xls_file_name = '%s汇总_%s.xlsx' % (
-        #     detail_cost_sheet, datetime.datetime.now().date().strftime('%y%m%d'))
-        # # report_xls(xls_file_name, work_load_sheet,
-        # #            df_sum_cost_by_family)
-    except Exception as e:
-        return e
+        if(IS_WINDOW):
+            info = '数据处理'
+            show_win_title(myshow, win_title, info)
+        df = df_work_load
+        col_attr = df.columns[0]
+        df_work_load_rd = df[df[col_attr] == '研发'].drop([col_attr], axis=1)
+        df_work_load_nrd = df[df[col_attr] != '研发'].drop([col_attr], axis=1)
+
+        df_nrd = nrd_entire(df_work_load_nrd, df_detail_cost)
+        df_rd_bf_adj = rd_entire_before_adj(df_work_load_rd, df_detail_cost)
+        df_rd_af_adj = rd_entire_after_adj(df_rd_bf_adj)
+
+        if(IS_WINDOW):
+            info = '生成excel文件'
+            show_win_title(myshow, win_title, info)
+
+        xlsx = pd.ExcelWriter(xls_file_name)
+
+        # title = '非研发-全'
+        # write_xlsx(df_nrd, xlsx, title, month=work_load_sheet)
+        # df = df_nrd.groupby(['部门']).sum()
+        # title = '非研发-部门'
+        # write_xlsx(df, xlsx, title, month=work_load_sheet)
+        # df = df_nrd.groupby(['支付归口']).sum()
+        # title = '非研发-属地'
+        # write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        # title = '研发-全-调整前'
+        # write_xlsx(df_rd_bf_adj, xlsx, title, month=work_load_sheet)
+
+        # title = '研发-全-调整后'
+        # write_xlsx(df_rd_af_adj, xlsx, title, month=work_load_sheet)
+
+        # title = '研发-部门'
+        # df = df_rd_af_adj.groupby(['部门']).sum()
+        # write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        # title = '研发-属地'
+        # df = df_rd_af_adj.groupby(['属地']).sum()
+        # write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        # title = '研发-大类'
+        # df = df_rd_af_adj.groupby(['大类']).sum()
+        # write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        # title = '研发-项目'
+        # df = df_rd_af_adj.groupby(['项目', '项目归属']).sum()
+        # write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        # title = '研发-项目归属'
+        # df = df_rd_af_adj.groupby(['项目归属']).sum()
+        # write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        # title = '研发-调整前'
+        # df = df_rd_bf_adj.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
+        # write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        # title = '研发-调整后'
+        # df = df_rd_af_adj.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
+        # write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        df1 = df_rd_bf_adj
+        df2 = df_nrd
+        df = pd.concat([df1, df2])
+
+        title = '合并-调整前'
+        df = df.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
+        write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        df1 = df_rd_af_adj
+        df2 = df_nrd
+        df = pd.concat([df1, df2])
+
+        title = '合并-调整后'
+        df = df.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
+        write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        xlsx.close()
+
+        workbook = openpyxl.load_workbook(xls_file_name)
+        for sht in workbook.sheetnames:
+            if(IS_WINDOW):
+                info = '格式-%s' % sht
+                show_win_title(myshow, win_title, info)
+            format_xlsx(workbook, sheet_name=sht)
+        workbook.save(filename=xls_file_name)
+
+    except Exception:
+        # return repr(e)
+        return traceback.format_exc()
+
+    finally:
+        if(IS_WINDOW):
+            myshow.setWindowTitle(win_title)
+
     return(xls_file_name)
 
 
@@ -290,15 +366,15 @@ class MyWindow(QtWidgets.QWidget, Ui_Form):
         detail_cost_file = self.txt_detail_cost.text()
         detail_cost_sheet = self.txt_detail_txt_sheet.text()
 
-        # work_load_file = r'E:\py\toolkit\cost\人员费用分摊.xlsx'
-        # work_load_sheet = '4月'
-        # detail_cost_file = r'E:\py\toolkit\cost\4月工时分摊表 - 副本(1).xlsx'
-        # # detail_cost_sheet = '社保'
+        # work_load_file = r'.\工时比例.xlsx'
+        # work_load_sheet = '8月'
+        # detail_cost_file = r'.\费用明细.xlsx'
+        # detail_cost_sheet = '社保'
         # detail_cost_sheet = '公积金'
         # detail_cost_sheet = '工资'
 
         ret = backend_proc(work_load_file, work_load_sheet,
-                           detail_cost_file, detail_cost_sheet)
+                           detail_cost_file, detail_cost_sheet, myshow=self)
 
         if isinstance(ret, str):
             info = '生成文件: %s' % ret
@@ -322,43 +398,26 @@ class MyWindow(QtWidgets.QWidget, Ui_Form):
 
 
 def main():
-    app = QtWidgets.QApplication(sys.argv)
-    myshow = MyWindow()
-    myshow.setWindowTitle('cal_cost v%s' % VERSION)
-    myshow.show()
-    sys.exit(app.exec_())
+    if IS_WINDOW:
+        app = QtWidgets.QApplication(sys.argv)
+        myshow = MyWindow()
+        myshow.setWindowTitle('cal_cost v%s' % VERSION)
+        myshow.show()
+        sys.exit(app.exec_())
+    else:
+        print_version(VERSION)
+        work_load_file = r'.\工时比例.xlsx'
+        work_load_sheet = '8月'
+        detail_cost_file = r'.\费用明细.xlsx'
+        detail_cost_sheet = '社保'
+        detail_cost_sheet = '公积金'
+        detail_cost_sheet = '工资'
 
+        ret = backend_proc(work_load_file, work_load_sheet,
+                           detail_cost_file, detail_cost_sheet, myshow=None)
 
-def main1():
-    work_load_file = r'E:\py\toolkit\cost\2020人员工时分摊2.xlsx'
-    work_load_sheet = '8月'
-    detail_cost_file = r'E:\py\toolkit\cost\工时分摊表资料模板2.xlsx'
-    detail_cost_sheet = '社保'
-    # detail_cost_sheet = '公积金'
-    detail_cost_sheet = '工资'
-
-    # ret = backend_proc(work_load_file, work_load_sheet,
-    #    detail_cost_file, detail_cost_sheet)
-
-    df_work_load = pd.read_excel(
-        work_load_file, sheet_name=work_load_sheet,  header=[0, 1])
-    df_detail_cost = pd.read_excel(
-        detail_cost_file, sheet_name=detail_cost_sheet,
-        index_col=INX_NAME_DETAIL_COST)
-
-    df_work_load = clean_work_load(df_work_load)
-    df_detail_cost = clean_detail_cost(df_detail_cost)
-
-    # print(df_detail_cost)
-    # print(df_work_load)
-    df_sum_cost_by_family = sum_cost_by_family(df_work_load, df_detail_cost)
-    df_sum_cost_by_proj = sum_cost_by_proj(df_work_load, df_detail_cost)
-    # print(df_sum_cost_by_proj)
-
-    xls_file_name = '%s汇总_%s.xlsx' % (
-        detail_cost_sheet, datetime.datetime.now().date().strftime('%y%m%d'))
-    report_xls(xls_file_name, work_load_sheet,
-               df_sum_cost_by_family, df_sum_cost_by_proj)
+        print(ret)
+        wait_any_key()
 
 
 if __name__ == '__main__':
