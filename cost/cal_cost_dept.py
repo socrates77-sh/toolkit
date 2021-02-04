@@ -1,12 +1,5 @@
 # history:
-# 2020/4/12  v1.0  initial
-# 2020/4/13  v1.1  output 2 sheets
-# 2020/5/11  v1.2  add exception check
-# 2020/5/11  v2.0  change output scheme
-# 2020/12/17 v2.1  add project sheet
-# 2020/12/27 v3.0  re-design
-# 2021/2/3   v3.1  chang out scheme
-
+# 2021/2/4   v1.0  initial
 
 import os
 import sys
@@ -23,7 +16,7 @@ from myform import Ui_Form
 
 import traceback
 
-VERSION = '3.1'
+VERSION = '1.0'
 IS_WINDOW = False
 IS_WINDOW = True
 
@@ -31,7 +24,7 @@ INX_NAME_WORK_LOAD = 4
 INX_NAME_DETAIL_COST = 1
 SH_COMPANY = ['上海']
 GD_COMPANY = ['广上', '广州', '广深']
-NJ_COMPANY = ['南京', '南上']
+NJ_COMPANY = ['南京']
 
 
 def print_version(version):
@@ -65,8 +58,6 @@ def clean_detail_cost(df_detail_cost):
 
 
 def check_data(df_work_load, df_detail_cost):
-    df = df_work_load.copy()
-
     df = df_work_load.copy()
     col_attr = df.columns[0]
     s = (df[col_attr] == '研发') | (df[col_attr] == '非研发')
@@ -144,102 +135,93 @@ def check_data(df_work_load, df_detail_cost):
             raise Exception('<工时比例>%s: 非"%s"项目不为0' % (txt, loc_txt))
 
     df = df_detail_cost.copy()
-    s1 = df.index.names != ['姓名']
-    s2 = df.columns.to_list()[0:2] != ['部门', '支付归口']
+    s1 = df.index.names != ['部门']
+    s2 = df.columns.to_list()[0:2] != ['属性', '支付归口']
     if s1 or s2:
-        txt = '<费用明细>：列标题应该为“姓名” “部门” “支付归口”'
+        txt = '<部门费用>：列标题应该为“部门” “属性” “支付归口”'
         raise Exception(txt)
 
     df1 = df.iloc[:, 2:]
     df1 = df1.select_dtypes(exclude=['float64', 'int64'])
     if not df1.empty:
         txt = df1.columns.values
-        raise Exception('<费用明细>%s: 有非法值(not float64/int64)' % txt)
+        raise Exception('<部门费用>%s: 有非法值(not float64/int64)' % txt)
 
-    person_in_cost = set(df_detail_cost.index.values)
-    person_in_load = set(df_work_load.index.values)
-    person_missed = person_in_load-(person_in_cost & person_in_load)
-    if len(person_missed) > 0:
-        txt = '<工时比例>人员未出现<费用明细>中: %s' % person_missed
+    col_attr = df.columns[0]
+    s = (df[col_attr] == '研发') | (df[col_attr] == '非研发')
+    if s.all() == False:
+        txt = '<部门费用>：属性只能为“研发” “非研发”'
         raise Exception(txt)
 
-    person_missed = person_in_cost-(person_in_cost & person_in_load)
-    if len(person_missed) > 0:
-        txt = '<费用明细>人员未出现<工时比例>中: %s' % person_missed
-        raise Exception(txt)
-
-    if len(person_in_load) != len(df_work_load.index.values):
-        txt = '<工时比例>中有重复的员工名'
-        raise Exception(txt)
-
-    if len(person_in_cost) != len(df_detail_cost.index.values):
-        txt = '<费用明细>中有重复的员工名'
+    col_attr = df.columns[1]
+    valid_val = set(SH_COMPANY+GD_COMPANY+NJ_COMPANY)
+    all_val = set(df[col_attr].tolist())
+    if (valid_val | all_val) != valid_val:
+        txt = '<部门费用>：支付归口不为%s' % valid_val
         raise Exception(txt)
 
 
-# class ExcelDataException(Exception):
-#     pass
-#     # def __init__(self, msg):
-#     #     self.msg = msg
-
-#     # def __str__(self):
-#     #     msg = '费用明细表的人员未出现在人员分摊表中: %s' % self.msg
-#     #     return(str)
-
-
-def flatten_work_load_rd(df_work_load_rd, df_detail_cost):
-    df = df_work_load_rd.iloc[:, :-1]
+def adj_ratio_by_proj_loc(df_work_load, loc_txt):
+    df = df_work_load.iloc[:, 2:-1]
     sr = df.stack([0, 1, 2])
-    index_v = sr.index.values
-    val = sr.to_list()
+    sr.index.names = ['人员', '大类', '项目', '项目归属']
+    sr = sr.groupby(['大类', '项目', '项目归属']).sum()
+    sum_proj_loc = sr.groupby(['项目归属']).sum().sum()
+    ratio_by_proj_loc = sr.groupby(['项目归属']).sum()[loc_txt]/sum_proj_loc
+    ratio_by_proj_loc = sr.groupby(['项目归属']).sum()[loc_txt]
+    return sr.loc[(slice(None), slice(None), [loc_txt])].mul(1/ratio_by_proj_loc)
+
+
+def entire_cost(df_work_load, df_detail_cost):
+    df = df_detail_cost.copy()
+    df = df.reset_index()
+    df = df.set_index(['部门', '属性', '支付归口'])
+
+    index_v = df.index.values
+
     new_index = []
+    new_val = []
     for idx in index_v:
-        dept = df_detail_cost.loc[idx[0], '部门']
-        loc = df_detail_cost.loc[idx[0], '支付归口']
-        new_idx = (idx[0], dept, loc, idx[1], idx[2], idx[3])
-        new_index.append(new_idx)
+        dept = idx[0]
+        loc = idx[2]
+        if idx[1] == '非研发':
+            val = df.loc[idx].values
+            # dept=idx[0]
+            # loc = idx[2]
+            family = '其他'
+            project = '0000'
+            proj_loc = ''
+            new_idx = (dept, loc, family, project, proj_loc)
+            new_index.append(new_idx)
+            new_val.append(val)
+
+            # print(val)
+        else:
+            if loc in SH_COMPANY:
+                loc_txt = '上海'
+            elif loc in GD_COMPANY:
+                loc_txt = '广东'
+            else:
+                loc_txt = '南京'
+
+            sr = adj_ratio_by_proj_loc(df_work_load, loc_txt)
+            for idx_sr in sr.index.values:
+                # print(idx_sr)
+                ratio = sr[idx_sr]
+                # print(df.loc[idx]*ratio)
+                family = idx_sr[0]
+                project = idx_sr[1]
+                proj_loc = idx_sr[2]
+                val = df.loc[idx].values*ratio
+                # print(val)
+                new_idx = (dept, loc, family, project, proj_loc)
+                new_index.append(new_idx)
+                new_val.append(val)
 
     index = pd.MultiIndex.from_tuples(new_index)
-    sr_new = pd.Series(val, index=index)
-    sr_new.index.names = ['人员', '部门', '属地', '大类', '项目', '项目归属']
-    return sr_new
-
-
-def nrd_entire(df_work_load_nrd, df_detail_cost):
-    nrd_name = df_work_load_nrd.index.values
-    df = df_detail_cost.loc[nrd_name]
-    df['大类'] = '其他'
-    df['项目'] = '0000'
-    df['项目归属'] = ''
-    df = df.reset_index()
-    df = df.set_index(['姓名', '部门', '支付归口', '大类', '项目', '项目归属'])
-    df.index.names = ['人员', '部门', '属地', '大类', '项目', '项目归属']
-    return df
-
-
-def rd_entire_before_adj(df_work_load_rd, df_detail_cost):
-    sr = flatten_work_load_rd(df_work_load_rd, df_detail_cost)
-    df_cost = df_detail_cost.iloc[:, 2:]
-    df = df_cost.mul(sr, axis='index', level=0)
-    return df
-
-
-# def rd_entire_after_adj(df_rd_bf_adj):
-#     df = df_rd_bf_adj
-#     # sum_all = df.sum().sum()
-#     sum_sh_emp = df.groupby(['属地']).sum().loc[SH_COMPANY].sum().sum()
-#     sum_gd_emp = df.groupby(['属地']).sum().loc[GD_COMPANY].sum().sum()
-#     sum_sh_prj = df.groupby(['项目归属']).sum().loc['上海'].sum().sum()
-#     sum_gd_prj = df.groupby(['项目归属']).sum().loc['广东'].sum().sum()
-
-#     ratio_sh = sum_sh_emp/sum_sh_prj
-#     ratio_gd = sum_gd_emp/sum_gd_prj
-#     df_sh_prj = df.loc[(slice(None), slice(None), slice(
-#         None), slice(None), slice(None), ['上海']), :].mul(ratio_sh)
-#     df_gd_prj = df.loc[(slice(None), slice(None), slice(
-#         None), slice(None), slice(None), ['广东']), :].mul(ratio_gd)
-#     df_merge = pd.concat([df_sh_prj, df_gd_prj])
-#     return df_merge
+    df_new = pd.DataFrame(new_val, index=index, columns=df.columns)
+    df_new.index.names = ['部门', '属地', '大类', '项目', '项目归属']
+    return df_new
 
 
 def format_xlsx(workbook, sheet_name):
@@ -291,6 +273,7 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
         if(IS_WINDOW):
             info = '读取文件'
             show_win_title(myshow, win_title, info)
+
         df_work_load = pd.read_excel(
             work_load_file, sheet_name=work_load_sheet,  header=[0, 1, 2])
         df_detail_cost = pd.read_excel(
@@ -298,24 +281,10 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
         df_work_load = clean_work_load(df_work_load)
         df_detail_cost = clean_detail_cost(df_detail_cost)
         check_data(df_work_load, df_detail_cost)
-        df_detail_cost = df_detail_cost.replace(SH_COMPANY, '上海')
-        df_detail_cost = df_detail_cost.replace(GD_COMPANY, '广东')
-        df_detail_cost = df_detail_cost.replace(NJ_COMPANY, '南京')
 
         if(IS_WINDOW):
             info = '数据处理'
             show_win_title(myshow, win_title, info)
-        df = df_work_load
-        col_attr = df.columns[0]
-        col_loc = df.columns[1]
-        df_work_load_rd = df[df[col_attr] == '研发'].drop(
-            [col_attr, col_loc], axis=1)
-        df_work_load_nrd = df[df[col_attr] != '研发'].drop(
-            [col_attr, col_loc], axis=1)
-
-        df_nrd = nrd_entire(df_work_load_nrd, df_detail_cost)
-        df_rd_bf_adj = rd_entire_before_adj(df_work_load_rd, df_detail_cost)
-        # df_rd_af_adj = rd_entire_after_adj(df_rd_bf_adj)
 
         if(IS_WINDOW):
             info = '生成excel文件'
@@ -323,83 +292,21 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
 
         xlsx = pd.ExcelWriter(xls_file_name)
 
-        # title = '非研发-全'
-        # write_xlsx(df_nrd, xlsx, title, month=work_load_sheet)
-        # df = df_nrd.groupby(['部门']).sum()
-        # title = '非研发-部门'
-        # write_xlsx(df, xlsx, title, month=work_load_sheet)
-        # df = df_nrd.groupby(['支付归口']).sum()
-        # title = '非研发-属地'
-        # write_xlsx(df, xlsx, title, month=work_load_sheet)
-
-        # title = '研发-全-调整前'
-        # write_xlsx(df_rd_bf_adj, xlsx, title, month=work_load_sheet)
-
-        # title = '研发-全-调整后'
-        # write_xlsx(df_rd_af_adj, xlsx, title, month=work_load_sheet)
-
-        # title = '研发-部门'
-        # df = df_rd_af_adj.groupby(['部门']).sum()
-        # write_xlsx(df, xlsx, title, month=work_load_sheet)
-
-        # title = '研发-属地'
-        # df = df_rd_af_adj.groupby(['属地']).sum()
-        # write_xlsx(df, xlsx, title, month=work_load_sheet)
-
-        # title = '研发-大类'
-        # df = df_rd_af_adj.groupby(['大类']).sum()
-        # write_xlsx(df, xlsx, title, month=work_load_sheet)
-
-        # title = '研发-项目'
-        # df = df_rd_af_adj.groupby(['项目', '项目归属']).sum()
-        # write_xlsx(df, xlsx, title, month=work_load_sheet)
-
-        # title = '研发-项目归属'
-        # df = df_rd_af_adj.groupby(['项目归属']).sum()
-        # write_xlsx(df, xlsx, title, month=work_load_sheet)
-
-        # title = '研发-调整前'
-        # df = df_rd_bf_adj.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
-        # write_xlsx(df, xlsx, title, month=work_load_sheet)
-
-        # title = '研发-调整后'
-        # df = df_rd_af_adj.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
-        # write_xlsx(df, xlsx, title, month=work_load_sheet)
-
-        df1 = df_rd_bf_adj
-        df2 = df_nrd
-        df = pd.concat([df1, df2])
-
         title = '合并'
-        df = df.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
-        df1 = df.loc[(slice(None), ['上海'], slice(
-            None), slice(None), ['上海', '']), :]
-        df2 = df.loc[(slice(None), ['广东'], slice(
-            None), slice(None), ['广东', '']), :]
-        df3 = df.loc[(slice(None), ['南京'], slice(
-            None), slice(None), ['南京', '']), :]
-        df = pd.concat([df1, df2, df3])
+        df = entire_cost(df_work_load, df_detail_cost)
         write_xlsx(df, xlsx, title, month=work_load_sheet)
 
         title = '上海'
-        df = df1
-        write_xlsx(df, xlsx, title, month=work_load_sheet)
+        df1 = df.loc[(slice(None), SH_COMPANY), :]
+        write_xlsx(df1, xlsx, title, month=work_load_sheet)
 
         title = '广东'
-        df = df2
-        write_xlsx(df, xlsx, title, month=work_load_sheet)
+        df2 = df.loc[(slice(None), GD_COMPANY), :]
+        write_xlsx(df2, xlsx, title, month=work_load_sheet)
 
         title = '南京'
-        df = df3
-        write_xlsx(df, xlsx, title, month=work_load_sheet)
-
-        # df1 = df_rd_af_adj
-        # df2 = df_nrd
-        # df = pd.concat([df1, df2])
-
-        # title = '合并-调整后'
-        # df = df.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
-        # write_xlsx(df, xlsx, title, month=work_load_sheet)
+        df3 = df.loc[(slice(None), NJ_COMPANY), :]
+        write_xlsx(df3, xlsx, title, month=work_load_sheet)
 
         xlsx.close()
 
@@ -468,16 +375,16 @@ def main():
     if IS_WINDOW:
         app = QtWidgets.QApplication(sys.argv)
         myshow = MyWindow()
-        myshow.setWindowTitle('cal_cost v%s' % VERSION)
+        myshow.setWindowTitle('cal_cost_dept v%s' % VERSION)
         myshow.show()
         sys.exit(app.exec_())
     else:
         print_version(VERSION)
+
         work_load_file = r'.\工时分摊表202101_1.xlsx'
         work_load_sheet = '202101调整'
-        detail_cost_file = r'.\费用明细.xlsx'
-        detail_cost_sheet = '工资'
-        detail_cost_sheet = '公积金'
+        detail_cost_file = r'.\部门费用.xlsx'
+        detail_cost_sheet = '日常费用'
 
         ret = backend_proc(work_load_file, work_load_sheet,
                            detail_cost_file, detail_cost_sheet, myshow=None)
