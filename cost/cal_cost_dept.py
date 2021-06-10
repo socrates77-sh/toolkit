@@ -1,5 +1,6 @@
 # history:
 # 2021/2/4   v1.0  initial
+# 2021/6/10  v1.1  work load sheet changed
 
 import os
 import sys
@@ -16,11 +17,11 @@ from myform import Ui_Form
 
 import traceback
 
-VERSION = '1.0'
+VERSION = '1.1'
 IS_WINDOW = False
 IS_WINDOW = True
 
-INX_NAME_WORK_LOAD = 4
+INX_NAME_WORK_LOAD = 3
 INX_NAME_DETAIL_COST = 1
 SH_COMPANY = ['上海']
 GD_COMPANY = ['广上', '广州', '广深']
@@ -194,7 +195,6 @@ def entire_cost(df_work_load, df_detail_cost):
             new_idx = (dept, loc, family, project, proj_loc)
             new_index.append(new_idx)
             new_val.append(val)
-
             # print(val)
         else:
             if loc in SH_COMPANY:
@@ -298,15 +298,18 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
 
         title = '上海'
         df1 = df.loc[(slice(None), SH_COMPANY), :]
-        write_xlsx(df1, xlsx, title, month=work_load_sheet)
+        if not df1.empty:
+            write_xlsx(df1, xlsx, title, month=work_load_sheet)
 
         title = '广东'
-        df2 = df.loc[(slice(None), GD_COMPANY), :]
-        write_xlsx(df2, xlsx, title, month=work_load_sheet)
+        df1 = df.loc[(slice(None), GD_COMPANY), :]
+        if not df1.empty:
+            write_xlsx(df1, xlsx, title, month=work_load_sheet)
 
         title = '南京'
-        df3 = df.loc[(slice(None), NJ_COMPANY), :]
-        write_xlsx(df3, xlsx, title, month=work_load_sheet)
+        df1 = df.loc[(slice(None), NJ_COMPANY), :]
+        if not df1.empty:
+            write_xlsx(df1, xlsx, title, month=work_load_sheet)
 
         xlsx.close()
 
@@ -381,10 +384,12 @@ def main():
     else:
         print_version(VERSION)
 
-        work_load_file = r'.\工时分摊表202101_1.xlsx'
+        work_load_file = r'.\工时分摊表202101_2.xlsx'
         work_load_sheet = '202101调整'
-        detail_cost_file = r'.\部门费用.xlsx'
-        detail_cost_sheet = '日常费用'
+        # detail_cost_file = r'.\部门费用2.xlsx'
+        # detail_cost_sheet = '日常费用'
+        detail_cost_file = r'.\无锡出差费用.xlsx'
+        detail_cost_sheet = '06'
 
         ret = backend_proc(work_load_file, work_load_sheet,
                            detail_cost_file, detail_cost_sheet, myshow=None)

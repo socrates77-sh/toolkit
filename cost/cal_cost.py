@@ -6,6 +6,7 @@
 # 2020/12/17 v2.1  add project sheet
 # 2020/12/27 v3.0  re-design
 # 2021/2/3   v3.1  chang out scheme
+# 2021/6/10  v3.2  work load sheet changed
 
 
 import os
@@ -23,11 +24,11 @@ from myform import Ui_Form
 
 import traceback
 
-VERSION = '3.1'
+VERSION = '3.2'
 IS_WINDOW = False
 IS_WINDOW = True
 
-INX_NAME_WORK_LOAD = 4
+INX_NAME_WORK_LOAD = 3
 INX_NAME_DETAIL_COST = 1
 SH_COMPANY = ['上海']
 GD_COMPANY = ['广上', '广州', '广深']
@@ -473,7 +474,7 @@ def main():
         sys.exit(app.exec_())
     else:
         print_version(VERSION)
-        work_load_file = r'.\工时分摊表202101_1.xlsx'
+        work_load_file = r'.\工时分摊表202101_2.xlsx'
         work_load_sheet = '202101调整'
         detail_cost_file = r'.\费用明细.xlsx'
         detail_cost_sheet = '工资'
