@@ -474,7 +474,7 @@ def main():
         sys.exit(app.exec_())
     else:
         print_version(VERSION)
-        work_load_file = r'.\工时分摊表202101_2.xlsx'
+        work_load_file = r'.\工时分摊表202101_3.xlsx'
         work_load_sheet = '202101调整'
         detail_cost_file = r'.\费用明细.xlsx'
         detail_cost_sheet = '工资'

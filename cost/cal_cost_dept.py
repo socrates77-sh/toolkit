@@ -170,6 +170,7 @@ def adj_ratio_by_proj_loc(df_work_load, loc_txt):
     sum_proj_loc = sr.groupby(['项目归属']).sum().sum()
     ratio_by_proj_loc = sr.groupby(['项目归属']).sum()[loc_txt]/sum_proj_loc
     ratio_by_proj_loc = sr.groupby(['项目归属']).sum()[loc_txt]
+    # print(sr.loc[(slice(None), slice(None), [loc_txt])].mul(1/ratio_by_proj_loc))
     return sr.loc[(slice(None), slice(None), [loc_txt])].mul(1/ratio_by_proj_loc)
 
 
@@ -208,12 +209,12 @@ def entire_cost(df_work_load, df_detail_cost):
             for idx_sr in sr.index.values:
                 # print(idx_sr)
                 ratio = sr[idx_sr]
-                # print(df.loc[idx]*ratio)
                 family = idx_sr[0]
                 project = idx_sr[1]
                 proj_loc = idx_sr[2]
                 val = df.loc[idx].values*ratio
-                # print(val)
+                # print(idx)
+                # print(dept, loc, family, project, proj_loc,val)
                 new_idx = (dept, loc, family, project, proj_loc)
                 new_index.append(new_idx)
                 new_val.append(val)
@@ -384,18 +385,18 @@ def main():
     else:
         print_version(VERSION)
 
-        work_load_file = r'.\工时分摊表202101_2.xlsx'
-        work_load_sheet = '202101调整'
+        work_load_file = r'.\工时分摊表202110调整.xlsx'
+        work_load_sheet = '202110'
         # detail_cost_file = r'.\部门费用2.xlsx'
         # detail_cost_sheet = '日常费用'
-        detail_cost_file = r'.\无锡出差费用.xlsx'
-        detail_cost_sheet = '06'
+        detail_cost_file = r'.\部门费用1.xlsx'
+        detail_cost_sheet = '10月份'
 
         ret = backend_proc(work_load_file, work_load_sheet,
                            detail_cost_file, detail_cost_sheet, myshow=None)
 
         print(ret)
-        wait_any_key()
+        # wait_any_key()
 
 
 if __name__ == '__main__':
