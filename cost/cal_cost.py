@@ -7,6 +7,7 @@
 # 2020/12/27 v3.0  re-design
 # 2021/2/3   v3.1  chang out scheme
 # 2021/6/10  v3.2  work load sheet changed
+# 2022/3/24  v3.3  chang out scheme
 
 
 import os
@@ -24,7 +25,7 @@ from myform import Ui_Form
 
 import traceback
 
-VERSION = '3.2'
+VERSION = '3.3'
 IS_WINDOW = False
 IS_WINDOW = True
 
@@ -369,7 +370,8 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
 
         df1 = df_rd_bf_adj
         df2 = df_nrd
-        df = pd.concat([df1, df2])
+        df_whole = pd.concat([df1, df2])
+        df = df_whole
 
         title = '合并'
         df = df.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
@@ -384,15 +386,18 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
 
         title = '上海'
         df = df1
-        write_xlsx(df, xlsx, title, month=work_load_sheet)
+        if(len(df)):
+            write_xlsx(df, xlsx, title, month=work_load_sheet)
 
         title = '广东'
         df = df2
-        write_xlsx(df, xlsx, title, month=work_load_sheet)
+        if(len(df)):
+            write_xlsx(df, xlsx, title, month=work_load_sheet)
 
         title = '南京'
         df = df3
-        write_xlsx(df, xlsx, title, month=work_load_sheet)
+        if(len(df)):
+            write_xlsx(df, xlsx, title, month=work_load_sheet)
 
         # df1 = df_rd_af_adj
         # df2 = df_nrd
@@ -401,6 +406,31 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
         # title = '合并-调整后'
         # df = df.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
         # write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        df = df_whole
+        df = df.loc[~(df == 0).all(axis=1), :]
+        # df = df.groupby(['部门', '属地', '大类', '项目', '项目归属']).sum()
+        df1 = df.loc[(slice(None), slice(None), ['上海'], slice(
+            None), slice(None), ['上海', '']), :]
+        df2 = df.loc[(slice(None), slice(None), ['广东'], slice(
+            None), slice(None), ['广东', '']), :]
+        df3 = df.loc[(slice(None), slice(None), ['南京'], slice(
+            None), slice(None), ['南京', '']), :]
+
+        title = '上海-个人'
+        df = df1
+        if(len(df)):
+            write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        title = '广东-个人'
+        df = df2
+        if(len(df)):
+            write_xlsx(df, xlsx, title, month=work_load_sheet)
+
+        title = '南京-个人'
+        df = df3
+        if(len(df)):
+            write_xlsx(df, xlsx, title, month=work_load_sheet)
 
         xlsx.close()
 
@@ -474,17 +504,17 @@ def main():
         sys.exit(app.exec_())
     else:
         print_version(VERSION)
-        work_load_file = r'.\工时分摊表202101_3.xlsx'
-        work_load_sheet = '202101调整'
-        detail_cost_file = r'.\费用明细.xlsx'
-        detail_cost_sheet = '工资'
-        detail_cost_sheet = '公积金'
+        work_load_file = r'.\晟矽2021年12月工时分摊表(总表)-20211209 (3)(1)(1).xlsx'
+        work_load_sheet = '202102'
+        detail_cost_file = r'.\南京2021工时分摊表资料模板(1).xlsx'
+        # detail_cost_sheet = '工资'
+        detail_cost_sheet = '202101'
 
         ret = backend_proc(work_load_file, work_load_sheet,
                            detail_cost_file, detail_cost_sheet, myshow=None)
 
         print(ret)
-        wait_any_key()
+        # wait_any_key()
 
 
 if __name__ == '__main__':
