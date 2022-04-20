@@ -3,6 +3,7 @@
 # 2020/4/21  v1.1  MAX_BUS_NUM = 16; header first line delete a '/'
 # 2020/4/24  v1.2  add AIO, DIO pin type
 # 2020/10/4  v2.0  add verilog output function
+# 2022/4/20  v3.0  change verilog format, and power info
 
 import os
 import sys
@@ -14,10 +15,11 @@ import pandas as pd
 from PyQt5 import QtWidgets
 from myform import Ui_Form
 
-VERSION = '2.0'
+VERSION = '3.0'
 
 VALID_COLS = ['管脚方向', '管脚名']
-VALID_PIN_TYPE = ['POWER', 'AI', 'AO', 'AIO', 'DI', 'DO', 'DIO']
+VALID_PIN_TYPE = ['PR', 'GD', 'PR_IO', 'GD_IO',
+                  'AI', 'AO', 'AIO', 'DI', 'DO', 'DIO']
 MAX_BUS_NUM = 16
 
 
@@ -42,12 +44,16 @@ class MyWindow(QtWidgets.QWidget, Ui_Form):
 
         ret = xls_to_lib(xls_file_name, lib_name)
         ret1 = xls_to_v(xls_file_name, lib_name)
+        ret2 = xls_to_pg(xls_file_name, lib_name)
 
         if isinstance(ret, str):
             info = '生成文件: %s.lib' % ret
             QtWidgets.QMessageBox.information(self, '信息', info)
         if isinstance(ret1, str):
             info = '生成文件: %s.v' % ret
+            QtWidgets.QMessageBox.information(self, '信息', info)
+        if isinstance(ret2, str):
+            info = '生成文件: %s.[pg*]' % ret
             QtWidgets.QMessageBox.information(self, '信息', info)
         else:
             info = repr(ret)
@@ -155,8 +161,8 @@ def write_tail(f, lib_name):
     f.write('}  /* end of library %s*/\n' % lib_name)
 
 
-def is_valid_pin(pin_type):
-    return (pin_type in VALID_PIN_TYPE)
+# def is_valid_pin(pin_type):
+#     return (pin_type in VALID_PIN_TYPE)
 
 
 def pin_type_to_txt(pin_type):
@@ -200,16 +206,16 @@ def write_pin(f, item):
 
     # f.write('%s\n' % ({pin_type} & {'DI1', 'DO1'}))
     # f.write('%s\n' % is_valid_pin(pin_type))
-    if is_valid_pin(pin_type):
-        p = re.compile(r'(.+?)<(\d+):(\d+)>', re.S)
-        m = re.match(p, pin_name)
-        if m:
-            pin_main_name = m.group(1)
-            i_max = int(m.group(2))
-            i_min = int(m.group(3))
-            write_bus_pin(f, pin_type, pin_main_name, i_max, i_min)
-        else:
-            write_norm_pin(f, pin_type, pin_name)
+    # if is_valid_pin(pin_type):
+    p = re.compile(r'(.+?)<(\d+):(\d+)>', re.S)
+    m = re.match(p, pin_name)
+    if m:
+        pin_main_name = m.group(1)
+        i_max = int(m.group(2))
+        i_min = int(m.group(3))
+        write_bus_pin(f, pin_type, pin_main_name, i_max, i_min)
+    else:
+        write_norm_pin(f, pin_type, pin_name)
 
 
 def write_cell(f, cell_name, df):
@@ -234,6 +240,8 @@ def is_valid_sheet(df):
 def clean_df(df):
     df = df[VALID_COLS]
     df = df.dropna()
+    df = df.loc[df[VALID_COLS[0]].isin(VALID_PIN_TYPE)]
+    # test.loc[test["所属区域"]=="苏州"]
     return df
 
 
@@ -258,72 +266,73 @@ def xls_to_lib(xls_file_name, lib_name):
 
 def write_norm_pin_v(f, pin_type, pin_name):
     type_txt = pin_type_to_txt(pin_type)
-    # f.write('   pin (%s) {\n' % pin_name)
-    f.write('    %-10s wire  %s' % (type_txt, pin_name))
-    # f.write('           capacitance : 0.1;\n')
-    # f.write('   }\n')
-    # f.write('\n')
+    f.write('    %-10s %s;\n' % (type_txt, pin_name))
 
 
 def write_bus_pin_v(f, pin_type, pin_main_name, i_max, i_min):
     type_txt = pin_type_to_txt(pin_type)
-    # f.write('  bus (%s) {\n' % pin_main_name)
-    # # f.write('        bus_type       : "bus%d";\n' % (eval(i_max)+1))
-    # f.write('        bus_type       : "bus%d";\n' % (i_max+1))
-    # for i in range(i_max, i_min-1, -1):
-    #     # f.write('%s[%d]\n' % (pin_main_name, i))
-    #     f.write('        pin (%s[%d]) {\n' % (pin_main_name, i))
-    #     f.write('           direction : %s;\n' % type_txt)
-    #     f.write('           capacitance : 0.1;\n')
-    #     f.write('        }\n')
-    # f.write('   } /* end of bus %s */\n' % pin_main_name)
-    f.write('    %-10s wire  [%s:%s]%s' %
+    f.write('    %-10s [%s:%s]%s;\n' %
             (type_txt, i_max, i_min, pin_main_name))
 
-    # f.write('\n')
 
-
-def write_pin_v(f, item):
+def write_pin_v_1(f, item):
     pin_type = item[0]
     pin_name = item[1]
 
-    # f.write('%s\n' % ({pin_type} & {'DI1', 'DO1'}))
-    # f.write('%s\n' % is_valid_pin(pin_type))
-    if is_valid_pin(pin_type):
-        p = re.compile(r'(.+?)<(\d+):(\d+)>', re.S)
-        m = re.match(p, pin_name)
-        if m:
-            pin_main_name = m.group(1)
-            i_max = int(m.group(2))
-            i_min = int(m.group(3))
-            write_bus_pin_v(f, pin_type, pin_main_name, i_max, i_min)
-        else:
-            write_norm_pin_v(f, pin_type, pin_name)
+    p = re.compile(r'(.+?)<(\d+):(\d+)>', re.S)
+    m = re.match(p, pin_name)
+    if m:
+        pin_main_name = m.group(1)
+        # i_max = int(m.group(2))
+        # i_min = int(m.group(3))
+        # write_bus_pin_v(f, pin_type, pin_main_name, i_max, i_min)
+    else:
+        # write_norm_pin_v(f, pin_type, pin_name)
+        pin_main_name = pin_name
+
+    f.write('    %s' % pin_main_name)
+
+
+def write_pin_v_2(f, item):
+    pin_type = item[0]
+    pin_name = item[1]
+
+    p = re.compile(r'(.+?)<(\d+):(\d+)>', re.S)
+    m = re.match(p, pin_name)
+    if m:
+        pin_main_name = m.group(1)
+        i_max = int(m.group(2))
+        i_min = int(m.group(3))
+        write_bus_pin_v(f, pin_type, pin_main_name, i_max, i_min)
+    else:
+        write_norm_pin_v(f, pin_type, pin_name)
 
 
 def write_cell_v(f, cell_name, df):
     # print(lib_name)
     f.write('module %s (\n' % cell_name)
-    # f.write('   area            : 0;\n')
-    # f.write('   dont_touch      : true;\n')
-    # f.write('   dont_use        : true;\n')
-    # f.write('   map_only        : true;\n\n')
-    # print(df)
     num = df.shape[0]
     i = 0
     for _, row in df.iterrows():
-        # f.write(row.tolist())
-        write_pin_v(f, row.tolist())
         i += 1
-        if i < num-1:
-            # pin_type = row.tolist()[0]
-            # if is_valid_pin(pin_type):
-            f.write(',\n')
-        else:
-            f.write('\n')
+        write_pin_v_1(f, row.tolist())
 
-    f.write(');\n')
+        if i < num:
+            f.write(',\n')
+        # else:
+        #     f.write('\n')
+    f.write(');\n\n')
+
+    for _, row in df.iterrows():
+        write_pin_v_2(f, row.tolist())
+
     f.write('endmodule\n\n')
+
+
+def write_pg(filename, pin_list):
+    with open(filename, 'w+') as f:
+        for pin in pin_list:
+            f.write('%s ' % pin)
 
 
 def xls_to_v(xls_file_name, lib_name):
@@ -340,6 +349,60 @@ def xls_to_v(xls_file_name, lib_name):
                 write_cell_v(f, cell_name=sheet_name, df=df)
         # write_tail(f, lib_name)
         f.close()
+    except Exception as e:
+        return e
+    return(lib_name)
+
+
+def xls_to_pg(xls_file_name, lib_name):
+    try:
+        xlsx = pd.ExcelFile(xls_file_name)
+
+        # f = open(v_file, 'w+')
+        # write_header(f, lib_name)
+        all_p = []
+        all_g = []
+        all_pio = []
+        all_gio = []
+        for sheet_name in xlsx.sheet_names:
+            df = pd.read_excel(xlsx, sheet_name=sheet_name, header=2)
+            if is_valid_sheet(df):
+                df = clean_df(df)
+                df_p = df.loc[df[VALID_COLS[0]] == VALID_PIN_TYPE[0]]
+                l_df = df_p[VALID_COLS[1]].tolist()
+                all_p = all_p+l_df
+
+                df_g = df.loc[df[VALID_COLS[0]] == VALID_PIN_TYPE[1]]
+                l_df = df_g[VALID_COLS[1]].tolist()
+                all_g = all_g+l_df
+
+                df_pio = df.loc[df[VALID_COLS[0]] == VALID_PIN_TYPE[2]]
+                l_df = df_pio[VALID_COLS[1]].tolist()
+                all_pio = all_pio+l_df
+
+                df_gio = df.loc[df[VALID_COLS[0]] == VALID_PIN_TYPE[3]]
+                l_df = df_gio[VALID_COLS[1]].tolist()
+                all_gio = all_gio+l_df
+
+        all_p = list(set(all_p))
+        all_g = list(set(all_g))
+        all_pio = list(set(all_pio))
+        all_gio = list(set(all_gio))
+
+        filename = '%s.p' % lib_name
+        write_pg(filename, all_p)
+
+        filename = '%s.g' % lib_name
+        write_pg(filename, all_g)
+
+        filename = '%s.pio' % lib_name
+        write_pg(filename, all_pio)
+
+        filename = '%s.gio' % lib_name
+        write_pg(filename, all_gio)
+
+        # write_tail(f, lib_name)
+        # f.close()
     except Exception as e:
         return e
     return(lib_name)
