@@ -504,9 +504,9 @@ def main():
         sys.exit(app.exec_())
     else:
         print_version(VERSION)
-        work_load_file = r'.\晟矽2021年12月工时分摊表(总表)-20211209 (3)(1)(1).xlsx'
+        work_load_file = r'.\工时分摊表2021（2021旧工时）(1).xlsx'
         work_load_sheet = '202102'
-        detail_cost_file = r'.\南京2021工时分摊表资料模板(1).xlsx'
+        detail_cost_file = r'.\工时分摊表资料模板.xlsx'
         # detail_cost_sheet = '工资'
         detail_cost_sheet = '202101'
 
