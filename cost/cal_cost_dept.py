@@ -1,6 +1,7 @@
 # history:
 # 2021/2/4   v1.0  initial
 # 2021/6/10  v1.1  work load sheet changed
+# 2023/2/10  v1.2  add "江阴","南上"
 
 import os
 import sys
@@ -17,7 +18,7 @@ from myform import Ui_Form
 
 import traceback
 
-VERSION = '1.1'
+VERSION = '1.2'
 IS_WINDOW = False
 IS_WINDOW = True
 
@@ -25,7 +26,8 @@ INX_NAME_WORK_LOAD = 3
 INX_NAME_DETAIL_COST = 1
 SH_COMPANY = ['上海']
 GD_COMPANY = ['广上', '广州', '广深']
-NJ_COMPANY = ['南京']
+NJ_COMPANY = ['南京', '南上']
+JY_COMPANY = ['江阴']
 
 
 def print_version(version):
@@ -67,7 +69,7 @@ def check_data(df_work_load, df_detail_cost):
         raise Exception(txt)
 
     col_attr = df.columns[1]
-    valid_val = set(SH_COMPANY+GD_COMPANY+NJ_COMPANY)
+    valid_val = set(SH_COMPANY+GD_COMPANY+NJ_COMPANY+JY_COMPANY)
     all_val = set(df[col_attr].tolist())
     if (valid_val | all_val) != valid_val:
         txt = '<工时比例>：支付归口不为%s' % valid_val
@@ -109,7 +111,8 @@ def check_data(df_work_load, df_detail_cost):
         df1 = df[df[col_attr] == loc]
         df2 = df1.iloc[:, :-1]
         sr = df2.stack([0, 1, 2])
-        sr1 = sr.loc[(slice(None), slice(None), slice(None), ['广东', '南京'])]
+        sr1 = sr.loc[(slice(None), slice(None),
+                      slice(None), ['广东', '南京', '江阴'])]
         criteria = (sr1 < -0.00001) | (sr1 > 0.00001)
         if criteria.any():
             txt = sr1[criteria].index.values
@@ -119,7 +122,8 @@ def check_data(df_work_load, df_detail_cost):
         df1 = df[df[col_attr] == loc]
         df2 = df1.iloc[:, :-1]
         sr = df2.stack([0, 1, 2])
-        sr1 = sr.loc[(slice(None), slice(None), slice(None), ['上海', '南京'])]
+        sr1 = sr.loc[(slice(None), slice(None),
+                      slice(None), ['上海', '南京', '江阴'])]
         criteria = (sr1 < -0.00001) | (sr1 > 0.00001)
         if criteria.any():
             txt = sr1[criteria].index.values
@@ -129,7 +133,19 @@ def check_data(df_work_load, df_detail_cost):
         df1 = df[df[col_attr] == loc]
         df2 = df1.iloc[:, :-1]
         sr = df2.stack([0, 1, 2])
-        sr1 = sr.loc[(slice(None), slice(None), slice(None), ['上海', '广东'])]
+        sr1 = sr.loc[(slice(None), slice(None),
+                      slice(None), ['上海', '广东', '江阴'])]
+        criteria = (sr1 < -0.00001) | (sr1 > 0.00001)
+        if criteria.any():
+            txt = sr1[criteria].index.values
+            raise Exception('<工时比例>%s: 非"%s"项目不为0' % (txt, loc_txt))
+    loc_txt = '江阴'
+    for loc in JY_COMPANY:
+        df1 = df[df[col_attr] == loc]
+        df2 = df1.iloc[:, :-1]
+        sr = df2.stack([0, 1, 2])
+        sr1 = sr.loc[(slice(None), slice(None),
+                      slice(None), ['上海', '广东', '南京'])]
         criteria = (sr1 < -0.00001) | (sr1 > 0.00001)
         if criteria.any():
             txt = sr1[criteria].index.values
@@ -155,7 +171,7 @@ def check_data(df_work_load, df_detail_cost):
         raise Exception(txt)
 
     col_attr = df.columns[1]
-    valid_val = set(SH_COMPANY+GD_COMPANY+NJ_COMPANY)
+    valid_val = set(SH_COMPANY+GD_COMPANY+NJ_COMPANY+JY_COMPANY)
     all_val = set(df[col_attr].tolist())
     if (valid_val | all_val) != valid_val:
         txt = '<部门费用>：支付归口不为%s' % valid_val
@@ -309,6 +325,11 @@ def backend_proc(work_load_file, work_load_sheet, detail_cost_file, detail_cost_
 
         title = '南京'
         df1 = df.loc[(slice(None), NJ_COMPANY), :]
+        if not df1.empty:
+            write_xlsx(df1, xlsx, title, month=work_load_sheet)
+
+        title = '江阴'
+        df1 = df.loc[(slice(None), JY_COMPANY), :]
         if not df1.empty:
             write_xlsx(df1, xlsx, title, month=work_load_sheet)
 
